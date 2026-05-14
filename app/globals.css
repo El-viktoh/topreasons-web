@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode - Premium clean with yellow accents */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    /* Primary - Bold Yellow */
+    --primary: 48 100% 45%;
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 48 100% 55%;
+
+    /* Secondary */
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 15%;
+
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
+
+    /* Accent */
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 10%;
+    --accent-light: 0 0% 85%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 48 100% 45%;
+
+    --success: 145 65% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --radius: 0.25rem;
+
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 48 100% 45%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 48 100% 45%;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary - Bold Yellow */
+    --primary: 48 100% 50%;
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 48 100% 60%;
+
+    /* Secondary */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    /* Accent */
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 98%;
+    --accent-light: 0 0% 25%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 48 100% 50%;
+
+    --success: 145 65% 55%;
+    --success-foreground: 0 0% 10%;
+
+    --radius: 0.25rem;
+
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 48 100% 50%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 48 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .btn-hero {
+    @apply bg-primary text-primary-foreground font-semibold px-8 py-4 uppercase tracking-widest text-sm;
+    @apply hover:bg-primary/90 transition-all duration-300;
+  }
+
+  .rental-card {
+    @apply bg-card rounded-sm overflow-hidden;
+    @apply hover:shadow-xl transition-all duration-300;
+    @apply border border-border;
+  }
+
+  .rental-card:hover {
+    box-shadow: 0 8px 30px -4px hsl(0 0% 0% / 0.5);
+  }
+
+  .search-container {
+    @apply bg-card/90 backdrop-blur-md rounded-sm p-6;
+    @apply border border-border;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

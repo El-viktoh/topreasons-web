@@ -1,0 +1,7 @@
+project_id = "hiapancqatgpacmgmfpd"
+
+[functions.send-booking-confirmation]
+verify_jwt = true
+
+[functions.send-renter-notification]
+verify_jwt = true
