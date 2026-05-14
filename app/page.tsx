@@ -80,15 +80,15 @@ export default function Home() {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
 
         <div className="relative z-10 container mx-auto px-4 flex-1 flex items-center">
           <div className="max-w-2xl">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 uppercase tracking-tight leading-none">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 uppercase tracking-tight leading-none text-white">
               The Service
               <span className="block text-primary">You Deserve</span>
             </h1>
-            <p className="text-lg md:text-xl mb-8 text-muted-foreground max-w-lg">
+            <p className="text-lg md:text-xl mb-8 text-white/80 max-w-lg">
               Rent quality cars across Ghana with Top Reasons — the trusted choice for airport transfers, city travel,
               and premium car rental in Accra.
             </p>
@@ -149,11 +149,11 @@ export default function Home() {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-xl">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight">Airport Transfers</h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Airport Transfers</h2>
+            <p className="text-lg text-white/80 mb-8">
               Need a reliable ride to or from Kotoka International Airport? We offer fixed pricing, flight tracking, and
               on-time guaranteed service for a stress-free travel experience.
             </p>
@@ -178,11 +178,11 @@ export default function Home() {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-background/95 via-background/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-l from-black/80 via-black/50 to-transparent" />
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-xl ml-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight">Business Accounts</h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Business Accounts</h2>
+            <p className="text-lg text-white/80 mb-8">
               Open a Top Reasons business account and enjoy seamless corporate travel management with fixed rates,
               priority booking, and dedicated support for your organization.
             </p>
@@ -284,13 +284,13 @@ export default function Home() {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-xl">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">
               Book<span className="text-primary"> Online</span>
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-white/80 mb-8">
               Experience premium car rental at your fingertips. Book your vehicle online in just a few clicks — fast,
               reliable, and hassle-free.
             </p>
