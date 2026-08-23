@@ -16,10 +16,7 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme] = useState<Theme>("dark");
 
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.add("dark");
-  }, []);
+
 
   const toggleTheme = () => {};
 
