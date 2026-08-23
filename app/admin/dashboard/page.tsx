@@ -18,9 +18,9 @@ interface CurrencyConfig {
 }
 
 const currencies: Record<Currency, CurrencyConfig> = {
-  USD: { symbol: "$", rate: 1, name: "US Dollar" },
-  GBP: { symbol: "£", rate: 0.79, name: "British Pound" },
-  GHS: { symbol: "GHC ", rate: 12.5, name: "Ghana Cedi" },
+  GHS: { symbol: "GHC ", rate: 1, name: "Ghana Cedi" },
+  USD: { symbol: "$", rate: 0.067, name: "US Dollar" },
+  GBP: { symbol: "£", rate: 0.053, name: "British Pound" },
 };
 
 interface DashboardMetrics {
