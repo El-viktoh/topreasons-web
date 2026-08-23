@@ -3,13 +3,17 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { Car, Home } from "lucide-react";
+import { Car, Home, Info, AlertCircle } from "lucide-react";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import Link from "next/link";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -17,12 +21,15 @@ export default function Booking() {
   const params = useParams();
   const id = params.id as string;
   const router = useRouter();
+  const { formatPrice } = useCurrency();
   const [rental, setRental] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isDemo, setIsDemo] = useState(false);
+  const [driveOption, setDriveOption] = useState<"self" | "chauffeur">("chauffeur");
 
   useEffect(() => {
     checkUser();
@@ -37,6 +44,19 @@ export default function Booking() {
       return;
     }
     setUser(user);
+
+    try {
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profileData) {
+        setProfile(profileData);
+      }
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
+    }
   };
 
   const fetchRental = async () => {
@@ -68,6 +88,11 @@ export default function Booking() {
       toast.error("Please select dates");
       return;
     }
+    const days = differenceInDays(dateRange.to, dateRange.from);
+    if (isCar && driveOption === "self" && days > 3) {
+      toast.error("Self drive allows a maximum booking of 3 days");
+      return;
+    }
     if (!user) {
       toast.error("Please sign in to book");
       router.push("/auth");
@@ -94,6 +119,7 @@ export default function Booking() {
           startDate: format(dateRange.from, "PPP"),
           endDate: format(dateRange.to, "PPP"),
           totalPrice: calculateTotal(),
+          driveOption: isCar ? driveOption : undefined,
         },
       });
 
@@ -114,39 +140,54 @@ export default function Booking() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">Loading...</div>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">Loading...</div>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (isDemo || !rental) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="max-w-md w-full">
-          <CardHeader className="text-center">
-            <CardTitle>{isDemo ? "Demo Rental" : "Rental Not Found"}</CardTitle>
-            <CardDescription>
-              {isDemo
-                ? "This is a demo listing for showcase purposes. Real rentals will be available soon!"
-                : "The rental you're looking for doesn't exist or has been removed."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => router.push("/")}>← Back to Home</Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <Card className="max-w-md w-full">
+            <CardHeader className="text-center">
+              <CardTitle>{isDemo ? "Demo Rental" : "Rental Not Found"}</CardTitle>
+              <CardDescription>
+                {isDemo
+                  ? "This is a demo listing for showcase purposes. Real rentals will be available soon!"
+                  : "The rental you're looking for doesn't exist or has been removed."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Button onClick={() => router.back()}>← Back</Button>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   const total = calculateTotal();
+  const selectedDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
+  
+  const hasUploadedIds = profile && profile.id_card_front_url && profile.id_card_back_url;
+  const isInvalidSelfDrive = isCar && driveOption === "self" && selectedDays > 3;
+  const isMissingSelfDriveIds = isCar && driveOption === "self" && !hasUploadedIds;
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <main className="flex-1 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <Button variant="outline" onClick={() => router.push("/")} className="mb-6">
-          ← Back to Home
+        <Button variant="outline" onClick={() => router.back()} className="mb-6">
+          ← Back
         </Button>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -161,11 +202,13 @@ export default function Booking() {
             </CardHeader>
             <CardContent>
               {rental.image_url && (
-                <img
-                  src={rental.image_url}
-                  alt={rental.title}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
+                <div className="w-full rounded-lg bg-black/20 mb-4 flex items-center justify-center p-2">
+                  <img
+                    src={rental.image_url}
+                    alt={rental.title}
+                    className="w-full max-h-72 object-contain rounded-lg"
+                  />
+                </div>
               )}
               <p className="text-muted-foreground mb-4">{rental.description}</p>
               {rental.features?.length > 0 && (
@@ -177,7 +220,7 @@ export default function Booking() {
                 </div>
               )}
               <p className="text-2xl font-bold mt-4">
-                GH₵{rental.price_per_day}/{priceLabel}
+                {formatPrice(rental.price_per_day)}/{priceLabel}
               </p>
             </CardContent>
           </Card>
@@ -190,12 +233,53 @@ export default function Booking() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {isCar && (
+                <div className="space-y-3">
+                  <p className="font-medium text-sm">Drive Option</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      type="button"
+                      variant={driveOption === "self" ? "default" : "outline"}
+                      onClick={() => setDriveOption("self")}
+                      className="w-full"
+                    >
+                      Self Drive
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={driveOption === "chauffeur" ? "default" : "outline"}
+                      onClick={() => setDriveOption("chauffeur")}
+                      className="w-full"
+                    >
+                      Chauffeur
+                    </Button>
+                  </div>
+                  
+                  {driveOption === "self" ? (
+                    <div className="bg-warning/10 border border-warning/20 text-warning p-3 rounded-md text-sm flex gap-2">
+                      <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                      <p>
+                        <strong>Terms & Conditions:</strong> Self-drive rentals allow a maximum booking period of 3 days. Standard insurance and security deposits apply.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-primary/10 border border-primary/20 text-primary p-3 rounded-md text-sm flex gap-2">
+                      <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                      <p>
+                        <strong>Chauffeur Service:</strong> Sit back and relax! Enjoy a premium experience with our highly trained, professional drivers ensuring a safe and comfortable journey.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <Calendar
                 mode="range"
                 selected={dateRange}
                 onSelect={setDateRange}
                 numberOfMonths={1}
                 disabled={{ before: new Date() }}
+                max={isCar && driveOption === "self" ? 4 : undefined}
                 className="rounded-md border"
               />
 
@@ -211,11 +295,11 @@ export default function Booking() {
                   </div>
                   <div className="flex justify-between">
                     <span>{durationLabel}:</span>
-                    <span className="font-semibold">{differenceInDays(dateRange.to, dateRange.from)}</span>
+                    <span className="font-semibold">{selectedDays}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t">
                     <span>Total:</span>
-                    <span>GH₵{total.toFixed(2)}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
                 </div>
               )}
@@ -224,14 +308,34 @@ export default function Booking() {
                 className="w-full"
                 size="lg"
                 onClick={handleBooking}
-                disabled={!dateRange?.from || !dateRange?.to || booking}
+                disabled={!dateRange?.from || !dateRange?.to || booking || isInvalidSelfDrive || isMissingSelfDriveIds}
               >
-                {booking ? "Processing..." : "Confirm Booking"}
+                {booking 
+                  ? "Processing..." 
+                  : isMissingSelfDriveIds 
+                    ? "ID Verification Required" 
+                    : isInvalidSelfDrive 
+                      ? "Maximum 3 days allowed" 
+                      : "Confirm Booking"}
               </Button>
+              
+              {isMissingSelfDriveIds && (
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-md text-sm flex gap-2">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <p>
+                    <strong>Action Required:</strong> You must upload your ID cards (front and back) to your profile before you can book a Self-Drive rental.{" "}
+                    <Link href="/profile" className="font-semibold underline underline-offset-2">
+                      Go to My Profile
+                    </Link>
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
+      </main>
+      <Footer />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { format } from "date-fns";
 
 export default function BookingManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchBookings(); }, []);
@@ -47,12 +48,26 @@ export default function BookingManagement() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Manage Bookings</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold">Manage Bookings</h2>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Statuses</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="confirmed">Confirmed</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       {bookings.length === 0 ? (
         <Card><CardContent className="py-8 text-center text-muted-foreground">No bookings yet</CardContent></Card>
       ) : (
         <div className="grid gap-4">
-          {bookings.map((booking) => (
+          {bookings.filter(booking => statusFilter === "ALL" || booking.status === statusFilter).map((booking) => (
             <Card key={booking.id}>
               <CardContent className="pt-6">
                 <div className="space-y-4">
@@ -75,7 +90,7 @@ export default function BookingManagement() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Total Price</p>
-                      <p className="font-medium text-lg">${booking.total_price}</p>
+                      <p className="font-medium text-lg">GHC {booking.total_price}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Booked On</p>

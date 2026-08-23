@@ -48,11 +48,15 @@ export default function Wishlist() {
         const { data, error } = await supabase
           .from("rentals")
           .select("*")
-          .in("id", favorites)
-          .eq("approval_status", "approved");
+          .in("id", favorites);
 
         if (error) throw error;
-        setRentals(data || []);
+        setRentals((data || []).map((r) => ({
+          ...r,
+          image_url: r.image_url || "",
+          images: r.images || [],
+          features: r.features || [],
+        } as Rental)));
 
         if (data && data.length > 0) {
           const ratingsData = await fetchRatingsForRentals(data.map((r) => r.id));

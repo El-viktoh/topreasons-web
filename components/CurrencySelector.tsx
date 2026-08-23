@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DollarSign } from "lucide-react";
 
 const CURRENCIES: { value: Currency; label: string; symbol: string }[] = [
-  { value: "GHS", label: "Ghana Cedi", symbol: "GH₵" },
+  { value: "GHS", label: "Ghana Cedi", symbol: "GHC" },
   { value: "USD", label: "US Dollar", symbol: "$" },
   { value: "GBP", label: "British Pound", symbol: "£" },
 ];

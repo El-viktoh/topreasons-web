@@ -5,100 +5,106 @@
 @layer base {
   :root {
     /* Light mode - Premium clean with yellow accents */
-    --background: 0 0% 98%;
-    --foreground: 0 0% 8%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover-foreground: 0 0% 10%;
 
-    /* Primary - Bold Yellow */
-    --primary: 48 100% 45%;
+    /* Primary - Sharp Gold (Addison Lee style) */
+    --primary: 48 100% 48%;
     --primary-foreground: 0 0% 5%;
-    --primary-glow: 48 100% 55%;
+    --primary-glow: 48 100% 58%;
 
     /* Secondary */
-    --secondary: 0 0% 92%;
-    --secondary-foreground: 0 0% 15%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
     /* Accent */
-    --accent: 0 0% 92%;
-    --accent-foreground: 0 0% 10%;
-    --accent-light: 0 0% 85%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 12%;
+    --accent-light: 0 0% 90%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 48 100% 45%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 48 100% 48%;
 
     --success: 145 65% 40%;
     --success-foreground: 0 0% 100%;
 
-    --radius: 0.25rem;
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
 
-    --sidebar-background: 0 0% 97%;
-    --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 48 100% 45%;
+    --radius: 0.125rem; /* Sharper corners for executive feel */
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 18%;
+    --sidebar-primary: 48 100% 48%;
     --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 92%;
-    --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 48 100% 45%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 18%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 48 100% 48%;
   }
 
   .dark {
-    --background: 0 0% 4%;
+    --background: 0 0% 2%; /* Deeper black */
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 8%;
+    --card: 0 0% 6%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 8%;
+    --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary - Bold Yellow */
+    /* Primary - Sharp Gold */
     --primary: 48 100% 50%;
     --primary-foreground: 0 0% 5%;
     --primary-glow: 48 100% 60%;
 
     /* Secondary */
-    --secondary: 0 0% 12%;
+    --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
 
     /* Accent */
-    --accent: 0 0% 18%;
+    --accent: 0 0% 14%;
     --accent-foreground: 0 0% 98%;
-    --accent-light: 0 0% 25%;
+    --accent-light: 0 0% 20%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
     --ring: 48 100% 50%;
 
     --success: 145 65% 55%;
     --success-foreground: 0 0% 10%;
 
-    --radius: 0.25rem;
+    --warning: 25 95% 58%;
+    --warning-foreground: 0 0% 10%;
 
-    --sidebar-background: 0 0% 8%;
+    --radius: 0.125rem;
+
+    --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 48 100% 50%;
     --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent: 0 0% 12%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 15%;
+    --sidebar-border: 0 0% 12%;
     --sidebar-ring: 48 100% 50%;
   }
 }
@@ -110,7 +116,12 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter), system-ui, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: var(--font-playfair), serif;
   }
 
   html {
@@ -120,28 +131,128 @@
 
 @layer components {
   .btn-hero {
-    @apply bg-primary text-primary-foreground font-semibold px-8 py-4 uppercase tracking-widest text-sm;
-    @apply hover:bg-primary/90 transition-all duration-300;
+    @apply bg-primary text-primary-foreground font-bold px-10 py-5 uppercase tracking-[0.2em] text-xs;
+    @apply hover:bg-primary/90 transition-all duration-300 rounded-none shadow-lg hover:shadow-primary/20;
   }
 
   .rental-card {
-    @apply bg-card rounded-sm overflow-hidden;
-    @apply hover:shadow-xl transition-all duration-300;
-    @apply border border-border;
+    @apply bg-card rounded-none overflow-hidden;
+    @apply hover:shadow-2xl transition-all duration-500;
+    @apply border border-border/50;
   }
 
   .rental-card:hover {
-    box-shadow: 0 8px 30px -4px hsl(0 0% 0% / 0.5);
+    box-shadow: 0 20px 40px -10px hsl(0 0% 0% / 0.6);
   }
 
   .search-container {
-    @apply bg-card/90 backdrop-blur-md rounded-sm p-6;
-    @apply border border-border;
+    @apply bg-card/95 backdrop-blur-xl rounded-none p-8;
+    @apply border border-border/50 shadow-2xl;
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Bento Box Redesign Classes */
+  .bg-bento-dark {
+    background-color: #0f0f0f;
+  }
+  
+  .bg-bento-african {
+    background-color: #1a1412;
+    position: relative;
+    overflow: hidden;
+  }
+  .bg-bento-african::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/bg_african.jpg");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+    transition: transform 0.8s ease;
+    z-index: 0;
+  }
+  .bg-bento-african::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 30%, #0f0f0f 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .bg-bento-african:hover::before {
+    transform: scale(1.05);
+  }
+
+  .bg-bento-quality {
+    background-color: #141110;
+    position: relative;
+    overflow: hidden;
+  }
+  .bg-bento-quality::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    background-image: url("/assets/bg_cities.jpg");
+    background-size: cover;
+    background-position: left center;
+    opacity: 0.12;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 60%);
+    mask-image: linear-gradient(to right, transparent, black 60%);
+    transition: transform 0.5s ease;
+    z-index: 0;
+  }
+  .bg-bento-quality:hover::before {
+    transform: scale(1.05);
+  }
+
+  .bg-bento-time {
+    background-color: #1f1b1a;
+    position: relative;
+    overflow: hidden;
+  }
+  .bg-bento-time::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/bg_quality.jpg");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1;
+    mix-blend-mode: luminosity;
+    transition: transform 0.5s ease;
+    z-index: 0;
+  }
+  .bg-bento-time:hover::before {
+    transform: scale(1.05);
+  }
+
+  .bg-bento-cities {
+    background-color: #F3A712;
+    position: relative;
+    overflow: hidden;
+  }
+  .bg-bento-cities::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/bg_time.jpg");
+    background-size: cover;
+    background-position: center;
+    mix-blend-mode: multiply;
+    opacity: 0.15;
+    transition: transform 0.5s ease;
+    z-index: 0;
+  }
+  .bg-bento-cities:hover::before {
+    transform: scale(1.05);
   }
 }

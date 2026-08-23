@@ -76,7 +76,12 @@ export default function MyBookings() {
       .in("booking_id", bookingIds);
 
     const reviewedBookingIds = new Set(reviews?.map((r) => r.booking_id) || []);
-    setBookings((data || []).map((b) => ({ ...b, has_review: reviewedBookingIds.has(b.id) })));
+    setBookings((data || []).map((b) => ({ 
+      ...b, 
+      status: b.status || "pending", 
+      payment_status: b.payment_status || "pending", 
+      has_review: reviewedBookingIds.has(b.id) 
+    } as unknown as Booking)));
   };
 
   const canReview = (booking: Booking) => {
@@ -241,7 +246,7 @@ export default function MyBookings() {
                               )}
                               {booking.has_review && (
                                 <Badge variant="outline" className="flex items-center gap-1">
-                                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                  <Star className="w-3 h-3 fill-primary text-primary" />
                                   Reviewed
                                 </Badge>
                               )}

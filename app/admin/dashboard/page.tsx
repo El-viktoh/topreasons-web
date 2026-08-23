@@ -20,7 +20,7 @@ interface CurrencyConfig {
 const currencies: Record<Currency, CurrencyConfig> = {
   USD: { symbol: "$", rate: 1, name: "US Dollar" },
   GBP: { symbol: "£", rate: 0.79, name: "British Pound" },
-  GHS: { symbol: "GH₵", rate: 12.5, name: "Ghana Cedi" },
+  GHS: { symbol: "GHC ", rate: 12.5, name: "Ghana Cedi" },
 };
 
 interface DashboardMetrics {
@@ -42,7 +42,7 @@ interface RecentActivity {
 export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [currency, setCurrency] = useState<Currency>("USD");
+  const [currency, setCurrency] = useState<Currency>("GHS");
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalBookings: 0,
     totalRevenue: 0,
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
             rental_title: rentalResult.data?.title || "Unknown",
             user_email: profileResult.data?.email || "Unknown",
             total_price: Number(booking.total_price),
-            status: booking.status,
+            status: booking.status || "Unknown",
             created_at: booking.created_at,
           };
         });
@@ -135,9 +135,9 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed": return "text-green-600 bg-green-50";
-      case "pending": return "text-yellow-600 bg-yellow-50";
-      case "cancelled": return "text-red-600 bg-red-50";
+      case "confirmed": return "text-success bg-success/10";
+      case "pending": return "text-warning bg-warning/10";
+      case "cancelled": return "text-destructive bg-destructive/10";
       default: return "text-muted-foreground bg-muted";
     }
   };

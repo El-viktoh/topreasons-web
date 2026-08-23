@@ -78,8 +78,8 @@ export const Header = () => {
 
   const navItems = [
     { label: "Home", href: "/" },
-    { label: "Cars", href: "/cars" },
-    { label: "Places to Stay", href: "/apartments" },
+    { label: "Our Offers", href: "/cars" },
+    { label: "Our Services", href: "/services" },
     { label: "Blog", href: "/blog" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
@@ -89,10 +89,10 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="xl:hidden">
               <button className="flex items-center gap-2 text-foreground uppercase text-xs tracking-widest font-medium">
                 <Menu className="w-5 h-5" />
                 Menu
@@ -101,7 +101,7 @@ export const Header = () => {
             <SheetContent side="left" className="w-80 bg-background">
               <div className="flex flex-col gap-6 mt-6">
                 <Link href="/" className="flex items-center gap-2 mb-4" onClick={() => setIsOpen(false)}>
-                  <img src="/assets/logo.png" alt="Top Reasons" className="h-8" />
+                  <img src="/assets/logo.png" alt="Top Reasons" className="h-10" />
                 </Link>
                 <nav className="flex flex-col gap-1">
                   {navItems.map((item) => (
@@ -136,6 +136,9 @@ export const Header = () => {
                           <p className="text-xs text-muted-foreground">{userEmail}</p>
                         </div>
                       </div>
+                      <Button variant="outline" className="justify-start text-xs uppercase tracking-widest" onClick={() => { router.push("/profile"); setIsOpen(false); }}>
+                        <User className="w-4 h-4 mr-2" /> My Profile
+                      </Button>
                       <Button variant="outline" className="justify-start text-xs uppercase tracking-widest" onClick={() => { router.push("/my-bookings"); setIsOpen(false); }}>
                         <ClipboardList className="w-4 h-4 mr-2" /> My Bookings
                       </Button>
@@ -171,7 +174,7 @@ export const Header = () => {
             </SheetContent>
           </Sheet>
 
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden xl:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -188,24 +191,17 @@ export const Header = () => {
         </div>
 
         <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
-          <img src="/assets/logo.png" alt="Top Reasons" className="h-8" />
+          <img src="/assets/logo.png" alt="Top Reasons" className="h-10 md:h-14 transition-all hover:scale-110" />
         </Link>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={toggleTheme}
-            className="text-foreground hover:text-primary transition-colors"
-            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-          <div className="hidden md:block">
+          <div className="hidden xl:block">
             <CurrencySelector />
           </div>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="hidden md:inline-flex text-xs uppercase tracking-widest text-foreground hover:text-primary transition-colors">
+                <button className="hidden xl:inline-flex text-xs uppercase tracking-widest text-foreground hover:text-primary transition-colors">
                   Account
                 </button>
               </DropdownMenuTrigger>
@@ -219,6 +215,9 @@ export const Header = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/")}>
                   <Home className="mr-2 h-4 w-4" /> Home
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  <User className="mr-2 h-4 w-4" /> My Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/my-bookings")}>
                   <ClipboardList className="mr-2 h-4 w-4" /> My Bookings
@@ -244,7 +243,7 @@ export const Header = () => {
             </DropdownMenu>
           ) : (
             <button
-              className="hidden md:inline-flex text-xs uppercase tracking-widest text-foreground hover:text-primary transition-colors"
+              className="hidden xl:inline-flex text-xs uppercase tracking-widest text-foreground hover:text-primary transition-colors"
               onClick={() => router.push("/auth")}
             >
               Sign In

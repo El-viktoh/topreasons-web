@@ -47,7 +47,6 @@ export default function RentalDetail() {
       .from("rentals")
       .select("*")
       .eq("id", id)
-      .eq("approval_status", "approved")
       .maybeSingle();
     if (!error && data) setRental(data);
     setLoading(false);
@@ -91,9 +90,9 @@ export default function RentalDetail() {
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Rental Not Found</h1>
           <p className="text-muted-foreground mb-6">This rental doesn't exist or has been removed.</p>
-          <Button onClick={() => router.push("/")}>
+          <Button onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
+            Back
           </Button>
         </div>
         <Footer />
@@ -115,11 +114,11 @@ export default function RentalDetail() {
 
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="relative">
-            <div className="relative overflow-hidden rounded-xl">
+            <div className="relative overflow-hidden rounded-xl bg-black/20 flex items-center justify-center p-2">
               <img
                 src={images[currentImageIndex]}
                 alt={`${rental.title} - Image ${currentImageIndex + 1}`}
-                className="w-full h-80 lg:h-[500px] object-cover"
+                className="max-w-full h-80 lg:h-[500px] object-contain"
               />
 
               {images.length > 1 && (
@@ -184,7 +183,7 @@ export default function RentalDetail() {
                 </div>
                 {reviewCount > 0 && (
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-primary text-primary" />
                     <span className="font-medium text-foreground">{averageRating}</span>
                     <span>({reviewCount} review{reviewCount !== 1 ? "s" : ""})</span>
                   </div>

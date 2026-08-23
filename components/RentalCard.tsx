@@ -18,7 +18,7 @@ interface RentalCardProps {
   reviewCount?: number;
   image: string;
   images?: string[];
-  type: "car" | "apartment";
+  type: string;
   features: string[];
   available: boolean;
   showFavorite?: boolean;
@@ -47,76 +47,107 @@ export const RentalCard = ({
 
   const handleCardClick = () => router.push(`/rental/${id}`);
 
-  const handleBookClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (available) router.push(`/booking/${id}`);
-  };
-
   return (
-    <Card className="rental-card group cursor-pointer" onClick={handleCardClick}>
-      <div className="relative overflow-hidden">
+    <Card 
+      className="bg-card border-none rounded-md overflow-hidden group cursor-pointer transition-all duration-500 flex flex-col"
+      onClick={handleCardClick}
+    >
+      {/* Image Section */}
+      <div className="relative h-48 overflow-hidden bg-black/40 flex items-center justify-center">
         <img
           src={displayImage}
           alt={title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-contain p-1 group-hover:scale-110 transition-transform duration-700 ease-out"
         />
-        <div className="absolute top-3 left-3">
-          <Badge variant={type === "car" ? "default" : "secondary"} className="bg-white/90 text-primary">
-            {type === "car" ? "Car" : "Apartment"}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80 pointer-events-none" />
+
+        {/* Category Badge */}
+        {type && (
+          <Badge className="absolute top-4 left-4 z-10 bg-background/80 backdrop-blur-sm text-foreground border border-border rounded-sm uppercase text-[10px] tracking-wider font-bold px-2 py-1 hover:bg-background/80">
+            {type}
           </Badge>
-        </div>
-        <div className="absolute top-3 right-3 flex items-center gap-2">
+        )}
+
+        {/* Favorite Icon */}
+        <div className="absolute top-4 right-4 z-10">
           {showFavorite && (
-            <FavoriteButton isFavorite={isFavorite(id)} onToggle={() => toggleFavorite(id)} size="sm" />
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(id);
+              }}
+              className="text-white/70 hover:text-white transition-colors"
+            >
+              <svg 
+                width="20" height="20" viewBox="0 0 24 24" 
+                fill={isFavorite(id) ? "white" : "none"} 
+                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
           )}
-          <Badge variant={available ? "default" : "destructive"} className="bg-white/90">
-            {available ? "Available" : "Booked"}
-          </Badge>
         </div>
+
+        {/* Image Count Indicator */}
         {imageCount > 1 && (
-          <div className="absolute bottom-3 right-3">
-            <Badge variant="secondary" className="bg-background/80 flex items-center gap-1">
-              <Image className="w-3 h-3" />
-              {imageCount}
-            </Badge>
+          <div className="absolute bottom-4 right-4 flex items-center gap-1.5 text-white/70 text-xs">
+            <Image className="w-3.5 h-3.5" />
+            <span>{imageCount}</span>
           </div>
         )}
       </div>
 
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="font-semibold text-lg text-card-foreground group-hover:text-primary transition-colors">
+      {/* Content Section */}
+      <CardContent className="p-4 flex flex-col flex-grow justify-between">
+        <div className="mb-5">
+          <h3 className="font-semibold text-[17px] text-foreground group-hover:text-primary transition-colors line-clamp-1 mb-1.5">
             {title}
           </h3>
-          {reviewCount > 0 ? (
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{rating}</span>
-              <span className="text-sm text-muted-foreground">({reviewCount})</span>
-            </div>
-          ) : (
-            <span className="text-xs text-muted-foreground">New</span>
-          )}
-        </div>
 
-        <div className="flex items-center gap-1 text-muted-foreground mb-3">
-          <MapPin className="w-4 h-4" />
-          <span className="text-sm">{location}</span>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          {features.slice(0, 3).map((feature, index) => (
-            <Badge key={index} variant="outline" className="text-xs">{feature}</Badge>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <span className="text-2xl font-bold text-primary">{formatPrice(price)}</span>
-            <span className="text-muted-foreground">/{type === "car" ? "day" : "night"}</span>
+          {/* Location & Rating */}
+          <div className="flex items-center justify-between mb-4">
+            {location ? (
+              <div className="flex items-center gap-1 text-muted-foreground text-xs">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{location}</span>
+              </div>
+            ) : <span />}
+            {reviewCount > 0 && (
+              <div className="flex items-center gap-1 shrink-0">
+                <Star className="w-3.5 h-3.5 fill-primary text-primary" />
+                <span className="text-xs font-semibold text-foreground">{rating.toFixed(1)}</span>
+                <span className="text-[11px] text-muted-foreground">({reviewCount})</span>
+              </div>
+            )}
           </div>
-          <Button size="sm" disabled={!available} className="bg-primary hover:bg-primary/90" onClick={handleBookClick}>
-            {available ? "Book Now" : "Unavailable"}
+
+          {/* Features Grid (2x2) */}
+          <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+            {features.slice(0, 4).map((feature, index) => {
+              // Basic parsing to split feature into label/value if possible, otherwise just show it
+              return (
+                <div key={index} className="flex items-center text-muted-foreground text-[11px] font-medium tracking-wide">
+                  <span className="truncate">{feature}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer Row (Price & Book Now) */}
+        <div className="flex items-center justify-between mt-auto">
+          <div className="text-primary font-black text-lg tracking-tight uppercase">
+            {formatPrice(price)}<span className="text-[10px] font-medium text-muted-foreground normal-case ml-1">/day</span>
+          </div>
+          <Button
+            className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-[10px] h-8 px-4 py-0 rounded-sm font-bold transition-all duration-300"
+            onClick={(e) => {
+              e.stopPropagation(); // prevent double navigation event
+              handleCardClick(); // go to rental detail page
+            }}
+          >
+            Book Now
           </Button>
         </div>
       </CardContent>

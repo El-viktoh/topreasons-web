@@ -15,6 +15,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RichTextEditor from "./RichTextEditor";
 
 interface BlogFormData {
@@ -27,6 +28,7 @@ const emptyForm: BlogFormData = { title: "", slug: "", excerpt: "", content: "",
 export default function BlogManagement() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<BlogFormData>(emptyForm);
   const [coverUploading, setCoverUploading] = useState(false);
@@ -101,11 +103,22 @@ export default function BlogManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-xl font-bold uppercase tracking-tight">Blog Posts</h2>
-        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground rounded-sm">
+        <div className="flex items-center gap-2">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Posts</SelectItem>
+              <SelectItem value="PUBLISHED">Published</SelectItem>
+              <SelectItem value="DRAFT">Drafts</SelectItem>
+            </SelectContent>
+          </Select>
+          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground rounded-sm">
               <Plus className="w-4 h-4 mr-2" />New Post
             </Button>
           </DialogTrigger>
@@ -163,13 +176,14 @@ export default function BlogManagement() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {isLoading ? (
         <p className="text-muted-foreground">Loading...</p>
       ) : posts && posts.length > 0 ? (
         <div className="space-y-3">
-          {posts.map((post) => (
+          {posts.filter(post => statusFilter === "ALL" || (statusFilter === "PUBLISHED" ? post.published : !post.published)).map((post) => (
             <div key={post.id} className="bg-card border border-border rounded-sm p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 {post.cover_image_url && <img src={post.cover_image_url} alt="" className="w-16 h-12 object-cover rounded-sm shrink-0" />}

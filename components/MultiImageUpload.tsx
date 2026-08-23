@@ -37,11 +37,29 @@ export default function MultiImageUpload({ bucket, folder, images, onImagesChang
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = folder ? `${folder}/${fileName}` : fileName;
 
-        const { error: uploadError } = await supabase.storage.from(bucket).upload(filePath, file);
-        if (uploadError) { toast.error(`Failed to upload ${file.name}`); continue; }
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", file);
+        uploadFormData.append("bucket", bucket);
+        uploadFormData.append("filePath", filePath);
 
-        const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
-        uploadedUrls.push(urlData.publicUrl);
+        const { data: { session } } = await supabase.auth.getSession();
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: uploadFormData,
+        });
+
+        if (!response.ok) {
+          console.error(`Upload failed for ${file.name}:`, await response.text());
+          toast.error(`Failed to upload ${file.name}`);
+          continue;
+        }
+
+        const data = await response.json();
+        uploadedUrls.push(data.url);
       }
 
       if (uploadedUrls.length > 0) {
