@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export default function BookingManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -42,6 +44,16 @@ export default function BookingManagement() {
       toast.success("Payment status updated");
       fetchBookings();
     } catch { toast.error("Failed to update payment status"); }
+  };
+
+  const handleDeleteBooking = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this booking? This action cannot be undone.")) return;
+    try {
+      const { error } = await supabase.from("bookings").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Booking deleted successfully");
+      fetchBookings();
+    } catch { toast.error("Failed to delete booking"); }
   };
 
   if (loading) return <div className="text-center py-8">Loading bookings...</div>;
@@ -97,30 +109,35 @@ export default function BookingManagement() {
                       <p className="font-medium">{format(new Date(booking.created_at), "PPP")}</p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Booking Status:</span>
-                      <Select value={booking.status} onValueChange={(value) => updateBookingStatus(booking.id, value)}>
-                        <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="flex flex-wrap gap-4 items-center justify-between w-full">
+                    <div className="flex flex-wrap gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Booking Status:</span>
+                        <Select value={booking.status} onValueChange={(value) => updateBookingStatus(booking.id, value)}>
+                          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Payment:</span>
+                        <Select value={booking.payment_status} onValueChange={(value) => updatePaymentStatus(booking.id, value)}>
+                          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="paid">Paid</SelectItem>
+                            <SelectItem value="refunded">Refunded</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Payment:</span>
-                      <Select value={booking.payment_status} onValueChange={(value) => updatePaymentStatus(booking.id, value)}>
-                        <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="paid">Paid</SelectItem>
-                          <SelectItem value="refunded">Refunded</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteBooking(booking.id)}>
+                      <Trash2 className="w-4 h-4 mr-2" /> Delete Booking
+                    </Button>
                   </div>
                 </div>
               </CardContent>
