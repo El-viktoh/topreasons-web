@@ -132,8 +132,8 @@ export default function RentalManagement() {
                     <SelectItem value="BASIC">Basic</SelectItem>
                     <SelectItem value="STANDARD">Standard</SelectItem>
                     <SelectItem value="SALOON PLUS">Saloon Plus</SelectItem>
-                    <SelectItem value="PREMIUM">Premium</SelectItem>
-                    <SelectItem value="PREMIUM SUV'S">Premium SUV's</SelectItem>
+                    <SelectItem value="LUXURY">Luxury</SelectItem>
+                    <SelectItem value="LUXURY SUV'S">Luxury SUV's</SelectItem>
                     <SelectItem value="4X4's">4x4's</SelectItem>
                     <SelectItem value="VANS">Vans</SelectItem>
                     <SelectItem value="Buses and Coaches">Buses and Coaches</SelectItem>
@@ -223,8 +223,8 @@ export default function RentalManagement() {
               <SelectItem value="BASIC">Basic</SelectItem>
               <SelectItem value="STANDARD">Standard</SelectItem>
               <SelectItem value="SALOON PLUS">Saloon Plus</SelectItem>
-              <SelectItem value="PREMIUM">Premium</SelectItem>
-              <SelectItem value="PREMIUM SUV'S">Premium SUV's</SelectItem>
+              <SelectItem value="LUXURY">Luxury</SelectItem>
+              <SelectItem value="LUXURY SUV'S">Luxury SUV's</SelectItem>
               <SelectItem value="4X4's">4x4's</SelectItem>
               <SelectItem value="VANS">Vans</SelectItem>
               <SelectItem value="Buses and Coaches">Buses and Coaches</SelectItem>

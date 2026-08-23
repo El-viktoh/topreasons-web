@@ -63,7 +63,7 @@ function CarsListContent() {
       let matchesPrice = true;
       if (priceRange === "budget") matchesPrice = rental.price_per_day < 100;
       else if (priceRange === "mid") matchesPrice = rental.price_per_day >= 100 && rental.price_per_day < 250;
-      else if (priceRange === "premium") matchesPrice = rental.price_per_day >= 250;
+      else if (priceRange === "luxury") matchesPrice = rental.price_per_day >= 250;
       
       const rentalCategory = rental.features?.find(f => f.startsWith('category:'))?.replace('category:', '') || rental.type;
       const matchesCategory = category === "ALL" || rentalCategory === category;
@@ -110,8 +110,8 @@ function CarsListContent() {
                   <SelectItem value="BASIC">Basic</SelectItem>
                   <SelectItem value="STANDARD">Standard</SelectItem>
                   <SelectItem value="SALOON PLUS">Saloon Plus</SelectItem>
-                  <SelectItem value="PREMIUM">Premium</SelectItem>
-                  <SelectItem value="PREMIUM SUV'S">Premium SUV's</SelectItem>
+                  <SelectItem value="LUXURY">Luxury</SelectItem>
+                  <SelectItem value="LUXURY SUV'S">Luxury SUV's</SelectItem>
                   <SelectItem value="4X4's">4x4's</SelectItem>
                   <SelectItem value="VANS">Vans</SelectItem>
                   <SelectItem value="Buses and Coaches">Buses and Coaches</SelectItem>
@@ -128,7 +128,7 @@ function CarsListContent() {
                   <SelectItem value="all">All Prices</SelectItem>
                   <SelectItem value="budget">Under GH₵100/day</SelectItem>
                   <SelectItem value="mid">GH₵100 - GH₵250/day</SelectItem>
-                  <SelectItem value="premium">GH₵250+/day</SelectItem>
+                  <SelectItem value="luxury">GHS 250+/day</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={setSortBy}>

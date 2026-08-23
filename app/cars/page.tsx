@@ -49,18 +49,18 @@ const services = [
     link: "/cars/list?category=SALOON PLUS" 
   },
   { 
-    title: "PREMIUM", 
+    title: "LUXURY", 
     description: "Versatile and stylish options for those who demand more from their travel.", 
     icon: ShieldCheck, 
     image: "/assets/services/premium.png",
-    link: "/cars/list?category=PREMIUM" 
+    link: "/cars/list?category=LUXURY" 
   },
   { 
-    title: "PREMIUM SUV'S", 
+    title: "LUXURY SUV'S", 
     description: "Luxury and power combined for the ultimate driving experience.", 
     icon: Navigation, 
     image: "/assets/services/premium-suv.png",
-    link: "/cars/list?category=PREMIUM SUV'S" 
+    link: "/cars/list?category=LUXURY SUV'S" 
   },
   { 
     title: "4X4's", 
