@@ -178,7 +178,7 @@ export default function Home() {
                   <div className="text-muted-foreground text-[11px] uppercase tracking-[0.2em] mt-1">Founded In</div>
                 </div>
                 <div className="px-6 py-5 text-center">
-                  <div className="text-3xl md:text-4xl font-black text-primary tracking-tight">50+</div>
+                  <div className="text-3xl md:text-4xl font-black text-primary tracking-tight">10+</div>
                   <div className="text-muted-foreground text-[11px] uppercase tracking-[0.2em] mt-1">Cities Covered</div>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function Home() {
                   <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20">
                     <MapPin className="w-5 h-5 text-primary" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-foreground text-lg font-bold tracking-wide">50+ Cities Covered</h3>
+                  <h3 className="text-foreground text-lg font-bold tracking-wide">10+ Cities Covered</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     Extensive coverage across major cities and towns to support your travel needs.
                   </p>
