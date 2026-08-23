@@ -44,7 +44,7 @@ export const BookingForm = () => {
           Get A<span className="text-primary"> Quote</span>
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
           <div className="space-y-2">
             <Label className="text-xs uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
               <MapPin className="w-3 h-3" /> Pickup Location

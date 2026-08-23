@@ -178,7 +178,7 @@ export default function Booking() {
   const selectedDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) : 0;
   
   const hasUploadedIds = profile && profile.id_card_front_url && profile.id_card_back_url;
-  const isInvalidSelfDrive = isCar && driveOption === "self" && selectedDays > 3;
+  const isInvalidSelfDrive = isCar && driveOption === "self" && selectedDays > 0 && selectedDays < 3;
   const isMissingSelfDriveIds = isCar && driveOption === "self" && !hasUploadedIds;
 
   return (
@@ -259,7 +259,7 @@ export default function Booking() {
                     <div className="bg-warning/10 border border-warning/20 text-warning p-3 rounded-md text-sm flex gap-2">
                       <Info className="w-4 h-4 shrink-0 mt-0.5" />
                       <p>
-                        <strong>Terms & Conditions:</strong> Self-drive rentals allow a maximum booking period of 3 days. Standard insurance and security deposits apply.
+                        <strong>Terms & Conditions:</strong> Self-drive rentals require a minimum booking period of 3 days. Standard insurance and security deposits apply.
                       </p>
                     </div>
                   ) : (
@@ -279,7 +279,7 @@ export default function Booking() {
                 onSelect={setDateRange}
                 numberOfMonths={1}
                 disabled={{ before: new Date() }}
-                max={isCar && driveOption === "self" ? 4 : undefined}
+                min={isCar && driveOption === "self" ? 3 : undefined}
                 className="rounded-md border"
               />
 
@@ -315,7 +315,7 @@ export default function Booking() {
                   : isMissingSelfDriveIds 
                     ? "ID Verification Required" 
                     : isInvalidSelfDrive 
-                      ? "Maximum 3 days allowed" 
+                      ? "Minimum 3 days required" 
                       : "Confirm Booking"}
               </Button>
               
