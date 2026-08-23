@@ -56,13 +56,13 @@ export default function ProfilePage() {
 
       if (profileData) {
         setProfile(profileData);
-        setFullName(profileData.full_name || "");
-        setPhone(profileData.phone || "");
-        setOccupation(profileData.occupation || "");
-        setWorkAddress(profileData.work_address || "");
-        setRegion(profileData.region || "");
-        setCountry(profileData.country || "");
-        if (profileData.avatar_url) setAvatarImages([profileData.avatar_url]);
+        setFullName((profileData as any).full_name || "");
+        setPhone((profileData as any).phone || "");
+        setOccupation((profileData as any).occupation || "");
+        setWorkAddress((profileData as any).work_address || "");
+        setRegion((profileData as any).region || "");
+        setCountry((profileData as any).country || "");
+        if ((profileData as any).avatar_url) setAvatarImages([(profileData as any).avatar_url]);
         if ((profileData as any).id_card_front_url) setFrontIdImages([(profileData as any).id_card_front_url]);
         if ((profileData as any).id_card_back_url) setBackIdImages([(profileData as any).id_card_back_url]);
       }
