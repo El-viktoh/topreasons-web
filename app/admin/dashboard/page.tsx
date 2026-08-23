@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, DollarSign, Home, Activity, Calendar, Trash2 } from "lucide-react";
+import { ArrowLeft, DollarSign, Home, Activity, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 type Currency = "USD" | "GBP" | "GHS";
@@ -123,17 +123,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteBooking = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this booking? This action cannot be undone.")) return;
-    try {
-      const { error } = await supabase.from("bookings").delete().eq("id", id);
-      if (error) throw error;
-      toast.success("Booking deleted successfully");
-      loadDashboardData();
-    } catch (error) {
-      toast.error("Failed to delete booking");
-    }
-  };
 
   const formatCurrency = (amount: number) => {
     const converted = amount * currencies[currency].rate;
@@ -264,9 +253,6 @@ export default function AdminDashboard() {
                         {activity.status}
                       </span>
                       <span className="font-semibold">{formatCurrency(activity.total_price)}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteBooking(activity.id)} className="text-destructive hover:bg-destructive/10 ml-2">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
                   </div>
                 ))}
