@@ -63,7 +63,7 @@ function CarsListContent() {
       let matchesPrice = true;
       if (priceRange === "budget") matchesPrice = rental.price_per_day < 100;
       else if (priceRange === "mid") matchesPrice = rental.price_per_day >= 100 && rental.price_per_day < 250;
-      else if (priceRange === "luxury") matchesPrice = rental.price_per_day >= 250;
+      else if (priceRange === "premium") matchesPrice = rental.price_per_day >= 250;
       
       const rentalCategory = rental.features?.find(f => f.startsWith('category:'))?.replace('category:', '') || rental.type;
       const matchesCategory = category === "ALL" || rentalCategory === category;
@@ -128,7 +128,7 @@ function CarsListContent() {
                   <SelectItem value="all">All Prices</SelectItem>
                   <SelectItem value="budget">Under GH₵100/day</SelectItem>
                   <SelectItem value="mid">GH₵100 - GH₵250/day</SelectItem>
-                  <SelectItem value="luxury">GHS 250+/day</SelectItem>
+                  <SelectItem value="premium">GH₵250+/day</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={setSortBy}>
