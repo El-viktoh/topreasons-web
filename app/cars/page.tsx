@@ -56,11 +56,11 @@ const services = [
     link: "/cars/list?category=LUXURY" 
   },
   { 
-    title: "LUXURY SUV'S", 
+    title: "PREMIUM SUV'S", 
     description: "Luxury and power combined for the ultimate driving experience.", 
     icon: Navigation, 
     image: "/assets/services/premium-suv.png",
-    link: "/cars/list?category=LUXURY SUV'S" 
+    link: "/cars/list?category=PREMIUM SUV'S" 
   },
   { 
     title: "4X4's", 
