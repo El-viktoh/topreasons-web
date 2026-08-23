@@ -21,10 +21,22 @@ export default function BookingManagement() {
     try {
       const { data, error } = await supabase
         .from("bookings")
-        .select("*, rentals (title, type, location), profiles (email, full_name)")
+        .select("*, rentals (title, type, location)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      setBookings(data || []);
+      
+      const bookingsWithProfiles = await Promise.all(
+        (data || []).map(async (booking) => {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", booking.user_id)
+            .maybeSingle();
+          return { ...booking, profiles: profileData || {} };
+        })
+      );
+      
+      setBookings(bookingsWithProfiles);
     } catch { toast.error("Failed to load bookings"); } finally { setLoading(false); }
   };
 
@@ -102,7 +114,7 @@ export default function BookingManagement() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Total Price</p>
-                      <p className="font-medium text-lg">GHC {booking.total_price}</p>
+                      <p className="font-medium text-lg">GHS {booking.total_price}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Booked On</p>

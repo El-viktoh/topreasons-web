@@ -177,7 +177,7 @@ export default function RentalManagement() {
               <div>
                 <Label>Price Per Day *</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">GHC</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">GHS</span>
                   <Input type="number" step="0.01" value={formData.price_per_day} onChange={(e) => setFormData({ ...formData, price_per_day: e.target.value })} placeholder="0.00" className="pl-12" />
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function RentalManagement() {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">{rental.description}</p>
-                  <p className="text-lg font-bold mb-4">GHC {rental.price_per_day}/day</p>
+                  <p className="text-lg font-bold mb-4">GHS {rental.price_per_day}/day</p>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" onClick={() => handleEdit(rental)}>Edit</Button>
                     <AlertDialog>

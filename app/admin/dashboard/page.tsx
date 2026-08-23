@@ -18,7 +18,7 @@ interface CurrencyConfig {
 }
 
 const currencies: Record<Currency, CurrencyConfig> = {
-  GHS: { symbol: "GHC ", rate: 1, name: "Ghana Cedi" },
+  GHS: { symbol: "GHS ", rate: 1, name: "Ghana Cedi" },
   USD: { symbol: "$", rate: 0.067, name: "US Dollar" },
   GBP: { symbol: "£", rate: 0.053, name: "British Pound" },
 };

@@ -19,7 +19,7 @@ const EXCHANGE_RATES: Record<Currency, number> = {
 };
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  GHS: "GHC ",
+  GHS: "GHS ",
   USD: "$",
   GBP: "£",
 };
