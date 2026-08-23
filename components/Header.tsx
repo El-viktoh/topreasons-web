@@ -191,7 +191,7 @@ export const Header = () => {
         </div>
 
         <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
-          <img src="/assets/logo.png" alt="Top Reasons" className="h-10 md:h-14 transition-all hover:scale-110" />
+          <img src="/assets/logo.png" alt="Top Reasons" className="h-12 sm:h-14 md:h-16 transition-all hover:scale-110" />
         </Link>
 
         <div className="flex items-center gap-4">
@@ -250,7 +250,7 @@ export const Header = () => {
             </button>
           )}
           <Button
-            className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase tracking-widest rounded-sm px-6 h-9"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] sm:text-xs uppercase tracking-widest rounded-sm px-3 sm:px-6 h-9"
             onClick={() => router.push("/cars")}
           >
             Book Now
