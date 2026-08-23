@@ -181,6 +181,15 @@ export default function Booking() {
   const isInvalidSelfDrive = isCar && driveOption === "self" && selectedDays > 0 && selectedDays < 3;
   const isMissingSelfDriveIds = isCar && driveOption === "self" && !hasUploadedIds;
 
+  const isProfileComplete = profile && 
+    profile.full_name && 
+    profile.phone && 
+    profile.occupation && 
+    profile.work_address && 
+    profile.region && 
+    profile.country && 
+    profile.avatar_url;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -308,18 +317,32 @@ export default function Booking() {
                 className="w-full"
                 size="lg"
                 onClick={handleBooking}
-                disabled={!dateRange?.from || !dateRange?.to || booking || isInvalidSelfDrive || isMissingSelfDriveIds}
+                disabled={!dateRange?.from || !dateRange?.to || booking || !isProfileComplete || isInvalidSelfDrive || isMissingSelfDriveIds}
               >
                 {booking 
                   ? "Processing..." 
-                  : isMissingSelfDriveIds 
-                    ? "ID Verification Required" 
-                    : isInvalidSelfDrive 
-                      ? "Minimum 3 days required" 
-                      : "Confirm Booking"}
+                  : !isProfileComplete
+                    ? "Complete Profile Required"
+                    : isMissingSelfDriveIds 
+                      ? "ID Verification Required" 
+                      : isInvalidSelfDrive 
+                        ? "Minimum 3 days required" 
+                        : "Confirm Booking"}
               </Button>
               
-              {isMissingSelfDriveIds && (
+              {!isProfileComplete && (
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-md text-sm flex gap-2">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <p>
+                    <strong>Profile Required:</strong> Please complete your profile with your phone, occupation, address, and profile photo before booking.{" "}
+                    <Link href="/profile" className="font-semibold underline underline-offset-2">
+                      Complete My Profile
+                    </Link>
+                  </p>
+                </div>
+              )}
+              
+              {isProfileComplete && isMissingSelfDriveIds && (
                 <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-md text-sm flex gap-2">
                   <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                   <p>

@@ -22,6 +22,12 @@ export default function ProfilePage() {
 
   // Form state
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [workAddress, setWorkAddress] = useState("");
+  const [region, setRegion] = useState("");
+  const [country, setCountry] = useState("");
+  const [avatarImages, setAvatarImages] = useState<string[]>([]);
   const [frontIdImages, setFrontIdImages] = useState<string[]>([]);
   const [backIdImages, setBackIdImages] = useState<string[]>([]);
 
@@ -51,6 +57,12 @@ export default function ProfilePage() {
       if (profileData) {
         setProfile(profileData);
         setFullName(profileData.full_name || "");
+        setPhone(profileData.phone || "");
+        setOccupation(profileData.occupation || "");
+        setWorkAddress(profileData.work_address || "");
+        setRegion(profileData.region || "");
+        setCountry(profileData.country || "");
+        if (profileData.avatar_url) setAvatarImages([profileData.avatar_url]);
         if ((profileData as any).id_card_front_url) setFrontIdImages([(profileData as any).id_card_front_url]);
         if ((profileData as any).id_card_back_url) setBackIdImages([(profileData as any).id_card_back_url]);
       }
@@ -68,6 +80,12 @@ export default function ProfilePage() {
     try {
       const updates = {
         full_name: fullName,
+        phone,
+        occupation,
+        work_address: workAddress,
+        region,
+        country,
+        avatar_url: avatarImages.length > 0 ? avatarImages[0] : null,
         id_card_front_url: frontIdImages.length > 0 ? frontIdImages[0] : null,
         id_card_back_url: backIdImages.length > 0 ? backIdImages[0] : null,
         updated_at: new Date().toISOString(),
@@ -139,6 +157,39 @@ export default function ProfilePage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
+                />
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+233 24 123 4567" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="occupation">Occupation</Label>
+                  <Input id="occupation" value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="Business Executive" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="workAddress">Residential / Work Address</Label>
+                  <Input id="workAddress" value={workAddress} onChange={(e) => setWorkAddress(e.target.value)} placeholder="123 Independence Ave, Accra" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="region">Region/State</Label>
+                  <Input id="region" value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Greater Accra" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Input id="country" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Ghana" />
+                </div>
+              </div>
+              <div className="space-y-3 pt-4 border-t">
+                <Label className="text-base font-semibold">Profile Photo</Label>
+                <p className="text-xs text-muted-foreground">Upload a clear photo of yourself to complete your profile.</p>
+                <MultiImageUpload
+                  bucket="rental-images"
+                  folder={`avatars/${user?.id}`}
+                  images={avatarImages}
+                  onImagesChange={setAvatarImages}
+                  maxImages={1}
                 />
               </div>
             </CardContent>
