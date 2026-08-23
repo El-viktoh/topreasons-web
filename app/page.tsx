@@ -109,14 +109,14 @@ export default function Home() {
         {/* Deep bottom fade to seamlessly blend into the trust section below */}
         <div className="absolute inset-x-0 bottom-0 h-[45vh] bg-gradient-to-t from-black via-black/50 to-transparent z-[2]" />
 
-        <div className="relative z-10 container mx-auto px-4 flex-1 flex items-center">
-          <div className="max-w-5xl">
+        <div className="relative z-10 container mx-auto px-4 flex-1 flex items-center justify-center md:justify-start">
+          <div className="max-w-5xl flex flex-col items-center md:items-start text-center md:text-left w-full">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 uppercase tracking-tight leading-none text-white">
               WELCOME!
               <span className="block text-primary text-xl sm:text-2xl md:text-3xl mt-2">Dear Travel Partner,</span>
             </h1>
             <div className="w-16 h-1 bg-primary mb-6" />
-            <p className="text-lg md:text-xl mb-10 text-white/80 max-w-2xl leading-relaxed">
+            <p className="hidden md:block text-lg md:text-xl mb-10 text-white/80 max-w-2xl leading-relaxed">
               TopReasons, your trusted travel partner, is Ghana’s most trusted one-stop solution for your travel experience. From premium car hire to airport shuttle or transfer service, courier services, airport assist, fast-track visa-on-arrival services, reliable taxi services, affordable luxury accommodation and exciting tour packages; all crafted for people travelling to, within and beyond Ghana.
             </p>
             <Button
