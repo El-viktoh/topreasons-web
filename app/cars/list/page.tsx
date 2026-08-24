@@ -31,18 +31,31 @@ interface RatingData {
 function CarsListContent() {
   const searchParams = useSearchParams();
   const defaultCategory = searchParams.get("category") || "ALL";
+  const defaultSearchQuery = searchParams.get("search") || "";
+  const defaultSortBy = searchParams.get("sort") || "newest";
+  const defaultPriceRange = searchParams.get("price") || "all";
 
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [ratings, setRatings] = useState<Map<string, RatingData>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
-  const [priceRange, setPriceRange] = useState("all");
+  const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
+  const [sortBy, setSortBy] = useState(defaultSortBy);
+  const [priceRange, setPriceRange] = useState(defaultPriceRange);
   const [category, setCategory] = useState(defaultCategory);
 
   useEffect(() => {
     fetchCars();
   }, []);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (category !== "ALL") url.searchParams.set("category", category); else url.searchParams.delete("category");
+    if (searchQuery) url.searchParams.set("search", searchQuery); else url.searchParams.delete("search");
+    if (sortBy !== "newest") url.searchParams.set("sort", sortBy); else url.searchParams.delete("sort");
+    if (priceRange !== "all") url.searchParams.set("price", priceRange); else url.searchParams.delete("price");
+    
+    window.history.replaceState(null, '', url.toString());
+  }, [category, searchQuery, sortBy, priceRange]);
 
   const fetchCars = async () => {
     setLoading(true);
