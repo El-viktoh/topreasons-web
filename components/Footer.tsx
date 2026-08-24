@@ -36,7 +36,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 uppercase tracking-widest text-xs text-primary">Support</h4>
             <ul className="space-y-3 text-sm">
               <li><Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Help Center</Link></li>
-              <li><span className="text-muted-foreground">support@topreasons.com</span></li>
+              <li><span className="text-muted-foreground">inquires@topreasonsco.com</span></li>
               <li><span className="text-muted-foreground">Accra, Ghana</span></li>
             </ul>
           </div>
