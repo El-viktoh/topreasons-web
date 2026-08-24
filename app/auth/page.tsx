@@ -277,7 +277,7 @@ export default function Auth() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 hidden">
                       <Label>I want to</Label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
