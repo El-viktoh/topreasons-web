@@ -56,6 +56,13 @@ const services = [
     link: "/cars/list?category=LUXURY" 
   },
   { 
+    title: "COMPACT SUV'S", 
+    description: "Perfect balance of efficiency and space for urban and light off-road travel.", 
+    icon: Navigation, 
+    image: "/assets/services/premium-suv.png",
+    link: "/cars/list?category=COMPACT SUV'S" 
+  },
+  { 
     title: "PREMIUM SUV'S", 
     description: "Luxury and power combined for the ultimate driving experience.", 
     icon: Navigation, 
