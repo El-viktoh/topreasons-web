@@ -12,7 +12,7 @@ import { Mail, Phone, MapPin, Clock, ArrowRight } from "lucide-react";
 
 const contactInfo = [
   { icon: Mail, title: "Email Us", content: "inquires@topreasonsco.com", description: "For general inquiries" },
-  { icon: Phone, title: "Call Us", content: "+233 XX XXX XXXX", description: "Mon-Fri 8am-6pm GMT" },
+  { icon: Phone, title: "Call Us", content: "+233 55 929 7448", description: "Mon-Fri 8am-6pm GMT" },
   { icon: MapPin, title: "Visit Us", content: "Accra, Ghana", description: "Greater Accra Region" },
   { icon: Clock, title: "Response Time", content: "Within 24 hours", description: "We respond quickly" },
 ];
