@@ -24,6 +24,7 @@ export default function Auth() {
   const [resetLoading, setResetLoading] = useState(false);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const [passwordUpdatedOpen, setPasswordUpdatedOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("signin");
   const [newPassword, setNewPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [passwordChecks, setPasswordChecks] = useState({
@@ -43,8 +44,31 @@ export default function Auth() {
       if (event === "PASSWORD_RECOVERY") setIsPasswordRecovery(true);
     });
 
-    return () => subscription.unsubscribe();
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "signin" || tab === "signup") {
+        setActiveTab(tab);
+      } else {
+        setActiveTab("signin");
+      }
+    };
+    
+    handlePopState();
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, []);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", value);
+    window.history.pushState(null, '', url.toString());
+  };
 
   const checkPasswordStrength = (password: string) => {
     setPasswordChecks({
@@ -232,7 +256,7 @@ export default function Auth() {
             </CardContent>
           </Card>
         ) : (
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
