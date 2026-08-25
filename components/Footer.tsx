@@ -5,7 +5,7 @@ export const Footer = () => {
     <footer className="py-10 px-4 bg-card border-t border-border">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-10 text-center">
-          <div className="md:col-span-1 flex flex-col items-center text-center">
+          <div className="md:col-span-1 flex flex-col items-center text-center -mt-2 md:-mt-6">
             <Link href="/" className="flex items-center justify-center gap-2 mb-1">
               <img src="/assets/logo.png" alt="Top Reasons" className="h-20 md:h-24" />
             </Link>
