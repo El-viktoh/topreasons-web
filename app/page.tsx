@@ -410,9 +410,9 @@ export default function Home() {
       </section>
 
       {/* Our Clients & Partners */}
-      <section className="py-24 px-4 bg-background border-y border-border">
+      <section className="py-12 px-4 bg-background border-y border-border">
         <div className="container mx-auto max-w-6xl text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-8 uppercase tracking-widest text-white">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 uppercase tracking-widest text-white">
             Our Clients & <span className="text-primary">Partners</span>
           </h2>
 
