@@ -4,7 +4,7 @@ export const Footer = () => {
   return (
     <footer className="py-16 px-4 bg-card border-t border-border">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12 text-center">
           <div className="md:col-span-1 flex flex-col items-center text-center">
             <Link href="/" className="flex items-center justify-center gap-2 mb-1">
               <img src="/assets/logo.png" alt="Top Reasons" className="h-20 md:h-24" />
