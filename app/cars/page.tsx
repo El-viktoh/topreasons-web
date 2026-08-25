@@ -73,7 +73,7 @@ const services = [
     title: "4X4's", 
     description: "Rugged performance for off-road adventures and tough terrains.", 
     icon: Mountain, 
-    image: "/assets/services/4x4.png",
+    image: "/assets/services/4x4.jpg",
     link: "/cars/list?category=4X4's" 
   },
   { 
