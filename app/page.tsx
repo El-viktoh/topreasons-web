@@ -109,8 +109,8 @@ export default function Home() {
         {/* Deep bottom fade to seamlessly blend into the trust section below */}
         <div className="absolute inset-x-0 bottom-0 h-[45vh] bg-gradient-to-t from-black via-black/50 to-transparent z-[2]" />
 
-        <div className="relative z-10 container mx-auto px-4 flex-1 flex items-center justify-center md:justify-start">
-          <div className="max-w-5xl flex flex-col items-center md:items-start text-center md:text-left w-full">
+        <div className="relative z-10 container mx-auto px-4 flex-1 flex items-center justify-center">
+          <div className="max-w-5xl flex flex-col items-center text-center w-full">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 uppercase tracking-tight leading-none text-white">
               WELCOME!
               <span className="block text-primary text-xl sm:text-2xl md:text-3xl mt-2">Dear Travel Partner</span>
