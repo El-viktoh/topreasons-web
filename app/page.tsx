@@ -116,7 +116,7 @@ export default function Home() {
               <span className="block text-primary text-xl sm:text-2xl md:text-3xl mt-2">Dear Travel Partner</span>
             </h1>
             <div className="w-16 h-1 bg-primary mb-6" />
-            <p className="hidden md:block text-lg md:text-xl mb-10 text-white/80 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base md:text-xl mb-10 text-white/80 max-w-2xl leading-relaxed">
               TopReasons, your trusted travel partner, is Ghana’s most trusted one-stop solution for your travel experience. From premium car hire to airport shuttle or transfer service, courier services, airport assist, fast-track visa-on-arrival services, reliable taxi services, affordable luxury accommodation and exciting tour packages; all crafted for people travelling to, within and beyond Ghana.
             </p>
             <Button
