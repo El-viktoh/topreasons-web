@@ -101,7 +101,7 @@ export const Header = () => {
             <SheetContent side="left" className="w-80 bg-background">
               <div className="flex flex-col gap-6 mt-6">
                 <Link href="/" className="flex items-center gap-2 mb-4" onClick={() => setIsOpen(false)}>
-                  <img src="/assets/logo.png" alt="Top Reasons" className="h-10" />
+                  <img src="/assets/logo.png" alt="Top Reasons" className="h-20" />
                 </Link>
                 <nav className="flex flex-col gap-1">
                   {navItems.map((item) => (
@@ -191,7 +191,7 @@ export const Header = () => {
         </div>
 
         <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
-          <img src="/assets/logo.png" alt="Top Reasons" className="h-12 sm:h-14 md:h-16 transition-all hover:scale-110" />
+          <img src="/assets/logo.png" alt="Top Reasons" className="h-24 sm:h-28 md:h-32 transition-all hover:scale-110" />
         </Link>
 
         <div className="flex items-center gap-4">

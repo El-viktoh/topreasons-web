@@ -226,7 +226,7 @@ export default function Auth() {
         </Button>
 
         <div className="flex items-center justify-center gap-2 mb-8">
-          <img src="/assets/logo.png" alt="Top Reasons" className="h-10" />
+          <img src="/assets/logo.png" alt="Top Reasons" className="h-20" />
         </div>
 
         {isPasswordRecovery ? (

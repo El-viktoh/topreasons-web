@@ -7,7 +7,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12 text-center md:text-left">
           <div className="md:col-span-1 flex flex-col items-center md:items-start">
             <Link href="/" className="flex items-center justify-center md:justify-start gap-2 mb-4">
-              <img src="/assets/logo.png" alt="Top Reasons" className="h-10 md:h-12" />
+              <img src="/assets/logo.png" alt="Top Reasons" className="h-20 md:h-24" />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Ghana's trusted car rental service — quality vehicles, affordable rates, reliable service.
