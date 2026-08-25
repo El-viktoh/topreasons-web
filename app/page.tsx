@@ -436,7 +436,7 @@ export default function Home() {
                   { name: "Marriott Hotels", src: "/assets/partners/marriott-hotels-resorts-logo-png-transparent.png" },
                   { name: "Zenith Bank", src: "/assets/partners/zenith-bank-nigeria.jpg" },
                 ].map((partner, idx) => (
-                  <div key={idx} className="bg-white rounded-sm p-1 sm:p-2 relative w-28 h-20 sm:w-36 sm:h-24 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(243,167,18,0.4)]">
+                  <div key={idx} className="bg-white rounded-sm p-1 sm:p-2 relative w-20 h-14 sm:w-28 sm:h-20 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(243,167,18,0.4)]">
                     <img
                       src={partner.src}
                       alt={partner.name}
