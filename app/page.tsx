@@ -424,16 +424,17 @@ export default function Home() {
                 className="flex shrink-0 animate-marquee items-center gap-8 md:gap-12 group-hover:[animation-play-state:paused]"
               >
                 {[
-                  { name: "Partner 1", src: "/assets/partners/new_partner_1.png" },
-                  { name: "Partner 2", src: "/assets/partners/new_partner_2.jpg" },
-                  { name: "Partner 3", src: "/assets/partners/new_partner_3.png" },
-                  { name: "Partner 4", src: "/assets/partners/new_partner_4.png" },
-                  { name: "Partner 5", src: "/assets/partners/new_partner_5.jpg" },
-                  { name: "Partner 1", src: "/assets/partners/new_partner_1.png" },
-                  { name: "Partner 2", src: "/assets/partners/new_partner_2.jpg" },
-                  { name: "Partner 3", src: "/assets/partners/new_partner_3.png" },
-                  { name: "Partner 4", src: "/assets/partners/new_partner_4.png" },
-                  { name: "Partner 5", src: "/assets/partners/new_partner_5.jpg" },
+                  { name: "Partner 1", src: "/assets/partners/14053364441.jpg" },
+                  { name: "Government of Ghana", src: "/assets/partners/coatofarmsofghanasvgpng_1585508918.png" },
+                  { name: "Fidelity Bank", src: "/assets/partners/fidelity-bank-logo-696x387.jpg" },
+                  { name: "Diasporan Affairs Office", src: "/assets/partners/gh_diasporan office.png" },
+                  { name: "GTBank", src: "/assets/partners/gtbank.png" },
+                  { name: "Partner 2", src: "/assets/partners/images (2).png" },
+                  { name: "Partner 3", src: "/assets/partners/images.jpeg" },
+                  { name: "Partner 4", src: "/assets/partners/images.png" },
+                  { name: "Partner 5", src: "/assets/partners/logo.png" },
+                  { name: "Marriott Hotels", src: "/assets/partners/marriott-hotels-resorts-logo-png-transparent.png" },
+                  { name: "Zenith Bank", src: "/assets/partners/zenith-bank-nigeria.jpg" },
                 ].map((partner, idx) => (
                   <div key={idx} className="bg-white rounded-sm p-1 sm:p-2 relative w-28 h-20 sm:w-36 sm:h-24 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(243,167,18,0.4)]">
                     <img
