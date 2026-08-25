@@ -52,21 +52,21 @@ const services = [
     title: "LUXURY", 
     description: "Versatile and stylish options for those who demand more from their travel.", 
     icon: ShieldCheck, 
-    image: "/assets/services/premium.png",
+    image: "/assets/services/premium-suv.png",
     link: "/cars/list?category=LUXURY" 
   },
   { 
     title: "COMPACT SUV'S", 
     description: "Perfect balance of efficiency and space for urban and light off-road travel.", 
     icon: Navigation, 
-    image: "/assets/services/premium-suv.png",
+    image: "/assets/services/compact-suv.jpg",
     link: "/cars/list?category=COMPACT SUV'S" 
   },
   { 
     title: "PREMIUM SUV'S", 
     description: "Luxury and power combined for the ultimate driving experience.", 
     icon: Navigation, 
-    image: "/assets/services/premium-suv.png",
+    image: "/assets/services/premium.png",
     link: "/cars/list?category=PREMIUM SUV'S" 
   },
   { 
