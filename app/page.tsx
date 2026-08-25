@@ -132,8 +132,8 @@ export default function Home() {
       </section>
 
       {/* Booking Form Section */}
-      <section className="relative z-20 py-8 bg-background border-b border-border">
-        <div className="container mx-auto px-4 max-w-5xl">
+      <section className="relative z-20 container mx-auto px-4 -mt-16 md:-mt-28 pb-8">
+        <div className="max-w-5xl mx-auto drop-shadow-2xl">
           <BookingForm />
         </div>
       </section>
