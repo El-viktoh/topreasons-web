@@ -80,21 +80,21 @@ const services = [
     title: "VANS", 
     description: "Versatile and spacious vans for all your transport needs.", 
     icon: Bus, 
-    image: "/assets/services/vans-buses.png",
+    image: "/assets/services/van.jpg",
     link: "/cars/list?category=VANS" 
   },
   { 
     title: "Buses and Coaches", 
     description: "Large capacity buses and coaches for group travel and tours.", 
     icon: Bus, 
-    image: "/assets/services/vans-buses.png",
+    image: "/assets/services/coach-bus.jpg",
     link: "/cars/list?category=Buses and Coaches" 
   },
   { 
     title: "MINI VANS", 
     description: "Comfortable and compact mini vans for family and small groups.", 
     icon: Bus, 
-    image: "/assets/services/vans-buses.png",
+    image: "/assets/services/mini-van.jpg",
     link: "/cars/list?category=MINI VANS" 
   },
   { 
