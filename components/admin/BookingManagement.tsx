@@ -105,8 +105,17 @@ export default function BookingManagement() {
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Customer</p>
-                      <p className="font-medium">{booking.profiles?.full_name || booking.profiles?.email}</p>
-                      <p className="text-xs text-muted-foreground">{booking.profiles?.email}</p>
+                      <p className="font-medium">
+                        {booking.user_id 
+                          ? (booking.profiles?.full_name || booking.profiles?.email || 'Unknown User') 
+                          : `${booking.guest_name || 'Unknown'} (Guest)`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {booking.user_id ? booking.profiles?.email : booking.guest_email}
+                      </p>
+                      {!booking.user_id && booking.guest_phone && (
+                        <p className="text-xs text-muted-foreground">{booking.guest_phone}</p>
+                      )}
                     </div>
                     <div>
                       <p className="text-muted-foreground">Dates</p>

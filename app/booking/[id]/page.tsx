@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Car, Home, Info, AlertCircle } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import Link from "next/link";
@@ -30,6 +32,9 @@ export default function Booking() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isDemo, setIsDemo] = useState(false);
   const [driveOption, setDriveOption] = useState<"self" | "chauffeur">("chauffeur");
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
 
   useEffect(() => {
     checkUser();
@@ -39,8 +44,7 @@ export default function Booking() {
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast.error("Please sign in to book");
-      router.push("/auth");
+      // Don't redirect, allow guest
       return;
     }
     setUser(user);
@@ -93,28 +97,41 @@ export default function Booking() {
       toast.error("Self drive allows a maximum booking of 3 days");
       return;
     }
-    if (!user) {
-      toast.error("Please sign in to book");
+    if (!user && isCar && driveOption === "self") {
+      toast.error("Please sign in to book a self-drive rental");
       router.push("/auth");
+      return;
+    }
+    if (!user && (!guestName || !guestEmail || !guestPhone)) {
+      toast.error("Please fill in your guest details");
       return;
     }
 
     setBooking(true);
     try {
-      const { error } = await supabase.from("bookings").insert({
-        user_id: user.id,
+      const payload: any = {
         rental_id: id,
         start_date: format(dateRange.from, "yyyy-MM-dd"),
         end_date: format(dateRange.to, "yyyy-MM-dd"),
         total_price: calculateTotal(),
         status: "pending",
         payment_status: "pending",
-      });
+      };
+
+      if (user) {
+        payload.user_id = user.id;
+      } else {
+        payload.guest_name = guestName;
+        payload.guest_email = guestEmail;
+        payload.guest_phone = guestPhone;
+      }
+
+      const { error } = await supabase.from("bookings").insert(payload);
       if (error) throw error;
 
       await supabase.functions.invoke("send-booking-confirmation", {
         body: {
-          email: user.email,
+          email: user ? user.email : guestEmail,
           rentalTitle: rental.title,
           startDate: format(dateRange.from, "PPP"),
           endDate: format(dateRange.to, "PPP"),
@@ -179,16 +196,19 @@ export default function Booking() {
   
   const hasUploadedIds = profile && profile.id_card_front_url && profile.id_card_back_url;
   const isInvalidSelfDrive = isCar && driveOption === "self" && selectedDays > 0 && selectedDays < 3;
-  const isMissingSelfDriveIds = isCar && driveOption === "self" && !hasUploadedIds;
+  const isMissingSelfDriveIds = isCar && driveOption === "self" && user && !hasUploadedIds;
 
-  const isProfileComplete = profile && 
+  const isProfileComplete = user ? (profile && 
     profile.full_name && 
     profile.phone && 
     profile.occupation && 
     profile.work_address && 
     profile.region && 
     profile.country && 
-    profile.avatar_url;
+    profile.avatar_url) : true;
+
+  const isGuestFormComplete = !user ? (guestName && guestEmail && guestPhone) : true;
+  const requireSignupForSelfDrive = !user && isCar && driveOption === "self";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -313,24 +333,61 @@ export default function Booking() {
                 </div>
               )}
 
+              {(!user && (!isCar || driveOption === "chauffeur")) && (
+                <div className="space-y-4 pt-4 border-t">
+                  <h4 className="font-semibold text-sm">Guest Details</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="guestName">Full Name</Label>
+                      <Input id="guestName" value={guestName} onChange={(e) => setGuestName(e.target.value)} placeholder="John Doe" />
+                    </div>
+                    <div>
+                      <Label htmlFor="guestEmail">Email Address</Label>
+                      <Input id="guestEmail" type="email" value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} placeholder="john@example.com" />
+                    </div>
+                    <div>
+                      <Label htmlFor="guestPhone">Phone Number</Label>
+                      <Input id="guestPhone" type="tel" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} placeholder="+233 XX XXX XXXX" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <Button
                 className="w-full"
                 size="lg"
                 onClick={handleBooking}
-                disabled={!dateRange?.from || !dateRange?.to || booking || !isProfileComplete || isInvalidSelfDrive || isMissingSelfDriveIds}
+                disabled={!dateRange?.from || !dateRange?.to || booking || (!isProfileComplete && user) || isInvalidSelfDrive || isMissingSelfDriveIds || !isGuestFormComplete || requireSignupForSelfDrive}
               >
                 {booking 
                   ? "Processing..." 
-                  : !isProfileComplete
-                    ? "Complete Profile Required"
-                    : isMissingSelfDriveIds 
-                      ? "ID Verification Required" 
-                      : isInvalidSelfDrive 
-                        ? "Minimum 3 days required" 
-                        : "Confirm Booking"}
+                  : requireSignupForSelfDrive
+                    ? "Sign up required for Self-Drive"
+                    : (!isProfileComplete && user)
+                      ? "Complete Profile Required"
+                      : isMissingSelfDriveIds 
+                        ? "ID Verification Required" 
+                        : isInvalidSelfDrive 
+                          ? "Minimum 3 days required" 
+                          : !isGuestFormComplete
+                            ? "Complete Guest Details"
+                            : "Confirm Booking"}
               </Button>
               
-              {!isProfileComplete && (
+              {requireSignupForSelfDrive && (
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-md text-sm flex gap-2">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <p>
+                    <strong>Sign In Required:</strong> Self-drive rentals require ID verification. Please{" "}
+                    <Link href="/auth" className="font-semibold underline underline-offset-2">
+                      sign in or create an account
+                    </Link>{" "}
+                    to continue.
+                  </p>
+                </div>
+              )}
+
+              {(!isProfileComplete && user) && (
                 <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-md text-sm flex gap-2">
                   <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                   <p>
