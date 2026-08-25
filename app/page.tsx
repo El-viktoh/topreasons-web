@@ -203,7 +203,7 @@ export default function Home() {
                   <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20">
                     <ShieldCheck className="w-5 h-5 text-primary" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-foreground text-lg font-bold tracking-wide">Trusted Across Africa</h3>
+                  <h3 className="text-foreground text-lg font-bold tracking-wide">Trusted Across Ghana and West Africa</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     Ghana's trusted car rental company with a proven track record of exceptional service.
                   </p>
