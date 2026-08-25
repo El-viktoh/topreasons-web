@@ -151,7 +151,6 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10 max-w-7xl">
           {/* Header */}
           <div className="text-center mb-14 md:mb-16">
-            <h4 className="text-muted-foreground tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Why Choose Us</h4>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary uppercase tracking-tight leading-none">
               What Sets Us Apart
             </h2>
