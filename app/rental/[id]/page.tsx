@@ -175,6 +175,9 @@ export default function RentalDetail() {
 
           <div className="space-y-6">
             <div>
+              <div className="text-primary font-bold text-sm tracking-widest uppercase mb-2">
+                {rental.features?.find(f => f.startsWith('category:'))?.replace('category:', '') || rental.type}
+              </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">{rental.title}</h1>
               <div className="flex items-center gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">

@@ -14,7 +14,7 @@ const contactInfo = [
   { icon: Mail, title: "Email Us", content: "inquiries@topreasonsco.com", description: "For general inquiries" },
   { icon: Phone, title: "Call Us", content: "+233 55 929 7448", description: "Mon-Fri 8am-6pm GMT" },
   { icon: MapPin, title: "Visit Us", content: "Accra, Ghana", description: "Greater Accra Region" },
-  { icon: Clock, title: "Response Time", content: "Within 24 hours", description: "We respond quickly" },
+  { icon: Clock, title: "Response Time", content: "Within 15 minutes", description: "We respond quickly" },
 ];
 
 const faqs = [
