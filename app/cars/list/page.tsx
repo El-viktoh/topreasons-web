@@ -74,9 +74,9 @@ function CarsListContent() {
         rental.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         rental.location.toLowerCase().includes(searchQuery.toLowerCase());
       let matchesPrice = true;
-      if (priceRange === "budget") matchesPrice = rental.price_per_day < 100;
-      else if (priceRange === "mid") matchesPrice = rental.price_per_day >= 100 && rental.price_per_day < 250;
-      else if (priceRange === "premium") matchesPrice = rental.price_per_day >= 250;
+      if (priceRange === "budget") matchesPrice = rental.price_per_day < 1000;
+      else if (priceRange === "mid") matchesPrice = rental.price_per_day >= 1000 && rental.price_per_day < 2500;
+      else if (priceRange === "premium") matchesPrice = rental.price_per_day >= 2500;
       
       const rentalCategory = rental.features?.find(f => f.startsWith('category:'))?.replace('category:', '') || rental.type;
       const matchesCategory = category === "ALL" || rentalCategory === category;
@@ -140,9 +140,9 @@ function CarsListContent() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Prices</SelectItem>
-                  <SelectItem value="budget">Under GH₵100/day</SelectItem>
-                  <SelectItem value="mid">GH₵100 - GH₵250/day</SelectItem>
-                  <SelectItem value="premium">GH₵250+/day</SelectItem>
+                  <SelectItem value="budget">Under GH₵1000/day</SelectItem>
+                  <SelectItem value="mid">GH₵1000 - GH₵2500/day</SelectItem>
+                  <SelectItem value="premium">GH₵2500+/day</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={setSortBy}>
