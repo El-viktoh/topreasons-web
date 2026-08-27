@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -12,7 +11,7 @@ import { ServicesShowcase } from "@/components/ServicesShowcase";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/lib/supabase/client";
-import { ArrowRight, Shield, Award, Users, Clock, Car, Plane, Briefcase, CarFront, Sparkles, ShieldCheck, Navigation, Mountain, Crown, Bus, MapPin } from "lucide-react";
+import { ArrowRight, Clock, ShieldCheck, Crown, MapPin } from "lucide-react";
 import { fetchRatingsForRentals } from "@/hooks/useRentalRating";
 import {
   Carousel,
@@ -66,13 +65,6 @@ export default function Home() {
     }
     setLoading(false);
   };
-
-  const features = [
-    { icon: Shield, title: "Trusted", description: "Ghana's trusted car rental company with a proven track record of exceptional service." },
-    { icon: Award, title: "Premium", description: "Well-maintained fleet of quality vehicles offering superior comfort for every journey." },
-    { icon: Users, title: "Reliable", description: "Wherever you need to be, we ensure prompt, dependable service — day or night." },
-    { icon: Clock, title: "Convenient", description: "Book online in seconds, pick up and go. Simple, fast, hassle-free car rental." },
-  ];
 
   return (
     <div className="min-h-screen bg-background">

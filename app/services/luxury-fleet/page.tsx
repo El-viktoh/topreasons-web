@@ -7,12 +7,11 @@ import {
   Briefcase, 
   CheckCircle2, 
   Laptop, 
-  Clock, 
-  Headphones, 
-  Leaf, 
-  PlaneTakeoff, 
-  Contact,
-  Car
+  Clock,
+  Headphones,
+  Leaf,
+  PlaneTakeoff,
+  Contact
 } from "lucide-react";
 
 export default function StandardCarServicesPage() {

@@ -30,7 +30,6 @@ export const BookingForm = () => {
   const [pickupDate, setPickupDate] = useState<Date>();
   const [pickupTime, setPickupTime] = useState("");
   const [returnDate, setReturnDate] = useState<Date>();
-  const [returnTime, setReturnTime] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

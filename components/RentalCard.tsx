@@ -4,9 +4,8 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Image } from "lucide-react";
+import { MapPin, Star, Image as ImageIcon } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { FavoriteButton } from "@/components/FavoriteButton";
 import { useFavorites } from "@/hooks/useFavorites";
 
 interface RentalCardProps {
@@ -35,7 +34,6 @@ export const RentalCard = ({
   images,
   type,
   features,
-  available,
   showFavorite = true,
 }: RentalCardProps) => {
   const router = useRouter();
@@ -92,7 +90,7 @@ export const RentalCard = ({
         {/* Image Count Indicator */}
         {imageCount > 1 && (
           <div className="absolute bottom-4 right-4 flex items-center gap-1.5 text-white/70 text-xs">
-            <Image className="w-3.5 h-3.5" />
+            <ImageIcon className="w-3.5 h-3.5" />
             <span>{imageCount}</span>
           </div>
         )}

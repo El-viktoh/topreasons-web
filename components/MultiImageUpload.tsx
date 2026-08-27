@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Loader2, X, Plus, Image } from "lucide-react";
+import { Loader2, X, Plus, Image as ImageIcon } from "lucide-react";
 
 interface MultiImageUploadProps {
   bucket: string;
@@ -111,7 +111,7 @@ export default function MultiImageUpload({ bucket, folder, images, onImagesChang
       </div>
 
       <p className="text-xs text-muted-foreground flex items-center gap-1">
-        <Image className="w-3 h-3" />
+        <ImageIcon className="w-3 h-3" />
         {images.length}/{maxImages} images • Max {maxSizeMB}MB each
       </p>
     </div>

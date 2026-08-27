@@ -13,8 +13,6 @@ import {
   ShieldCheck,
   Ban,
   Phone,
-  CalendarDays,
-  HelpCircle,
   XOctagon,
   PlaneTakeoff
 } from "lucide-react";

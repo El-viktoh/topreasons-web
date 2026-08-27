@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Shield, Award, Heart, MapPin, Target, Briefcase, Leaf, BookOpen, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { Shield, Award, Heart, MapPin, Target, Briefcase, Leaf, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const values = [

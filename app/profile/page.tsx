@@ -18,7 +18,6 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
 
   // Form state
   const [fullName, setFullName] = useState("");
@@ -55,7 +54,6 @@ export default function ProfilePage() {
       if (error) throw error;
 
       if (profileData) {
-        setProfile(profileData);
         setFullName((profileData as any).full_name || "");
         setPhone((profileData as any).phone || "");
         setOccupation((profileData as any).occupation || "");

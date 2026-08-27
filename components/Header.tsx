@@ -15,8 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, User, Home, LogOut, Shield, Calendar, ClipboardList, Heart, Sun, Moon } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Menu, User, Home, LogOut, Shield, Calendar, ClipboardList, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CurrencySelector } from "@/components/CurrencySelector";
 
@@ -27,7 +26,6 @@ export const Header = () => {
   const [userEmail, setUserEmail] = useState<string>("");
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     checkUser();

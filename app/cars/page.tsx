@@ -7,7 +7,7 @@ import { RentalCard } from "@/components/RentalCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import { Car, CarFront, Sparkles, ShieldCheck, Navigation, Mountain, Crown, Bus, ArrowRight, Grid3X3, Zap } from "lucide-react";
+import { Car, CarFront, Sparkles, ShieldCheck, Navigation, Mountain, Bus, ArrowRight, Zap } from "lucide-react";
 import { fetchRatingsForRentals } from "@/hooks/useRentalRating";
 
 interface Rental {

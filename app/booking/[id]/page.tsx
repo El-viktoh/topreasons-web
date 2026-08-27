@@ -74,7 +74,7 @@ export default function Booking() {
       const { data, error } = await supabase.from("rentals").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       setRental(data);
-    } catch (error: any) {
+    } catch {
       toast.error("Failed to load rental");
     } finally {
       setLoading(false);

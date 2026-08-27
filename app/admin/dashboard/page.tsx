@@ -74,7 +74,7 @@ export default function AdminDashboard() {
       }
 
       await loadDashboardData();
-    } catch (error) {
+    } catch {
       router.push("/");
     }
   };
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
         });
         setRecentActivity(await Promise.all(activityPromises));
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);

@@ -47,7 +47,7 @@ export default function Admin() {
       }
 
       setIsAdmin(true);
-    } catch (error: any) {
+    } catch {
       toast.error("Access denied");
       router.push("/");
     } finally {
