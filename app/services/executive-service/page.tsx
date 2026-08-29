@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ExpandableText } from "@/components/ExpandableText";
 import Link from "next/link";
 import { 
   ArrowRight, 
@@ -81,7 +82,7 @@ export default function ExecutiveServicePage() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] sm:h-screen sm:min-h-[700px] flex items-center justify-center overflow-hidden">
         <img 
           src="/assets/executive_hero_ghana.png"
           alt="Executive Chauffeur Services Ghana" 
@@ -97,9 +98,11 @@ export default function ExecutiveServicePage() {
           <h1 className="text-5xl md:text-7xl font-bold mb-6 uppercase tracking-tight text-foreground">
             Executive Chauffeur <span className="text-primary">Services</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-            Our Ghana Chauffeur Services have been refined to deliver consistently reliable and discreet services. Our Executive Services are the pinnacle of quality, an unsurpassed chauffeur-driven experience. We understand the importance of reputation and look to power businesses and individuals in Accra and beyond.
-          </p>
+          <ExpandableText
+            text="Our Ghana Chauffeur Services have been refined to deliver consistently reliable and discreet services. Our Executive Services are the pinnacle of quality, an unsurpassed chauffeur-driven experience. We understand the importance of reputation and look to power businesses and individuals in Accra and beyond."
+            wrapperClassName="max-w-3xl mx-auto mb-10"
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed font-light text-center"
+          />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/cars" 

@@ -87,7 +87,7 @@ export default function About() {
               {slides.map((slide, idx) => (
                 <p
                   key={idx}
-                  className={`[grid-area:1/1] self-center px-4 md:px-12 text-lg md:text-2xl leading-relaxed text-gray-300 font-light italic transition-all duration-700 ease-in-out ${
+                  className={`[grid-area:1/1] self-center px-4 md:px-12 text-lg md:text-2xl leading-relaxed text-gray-300 font-light italic transition-all duration-700 ease-in-out line-clamp-5 sm:line-clamp-none ${
                     currentSlide === idx
                       ? "opacity-100 translate-x-0"
                       : currentSlide < idx

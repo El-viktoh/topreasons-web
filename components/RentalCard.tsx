@@ -69,12 +69,14 @@ export const RentalCard = ({
         {/* Favorite Icon */}
         <div className="absolute top-4 right-4 z-10">
           {showFavorite && (
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleFavorite(id);
               }}
-              className="text-white/70 hover:text-white transition-colors"
+              aria-label={isFavorite(id) ? "Remove from wishlist" : "Add to wishlist"}
+              aria-pressed={isFavorite(id)}
+              className="flex items-center justify-center w-11 h-11 -m-2.5 text-white/70 hover:text-white transition-colors"
             >
               <svg 
                 width="20" height="20" viewBox="0 0 24 24" 

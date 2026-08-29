@@ -9,7 +9,7 @@ export default function TaxiChauffeurPage() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] sm:h-screen sm:min-h-[600px] flex items-center justify-center overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1920&q=80"
           alt="Taxi Chauffeur Service" 

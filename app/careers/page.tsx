@@ -36,7 +36,7 @@ export default function CareersPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[400px] sm:h-[60vh] sm:min-h-[500px] flex items-center justify-center overflow-hidden">
         <img 
           src="/assets/mercedes_s_class.png" 
           alt="TopReasons Careers" 

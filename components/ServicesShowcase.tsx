@@ -89,14 +89,14 @@ export function ServicesShowcase() {
           <div className="flex gap-4">
             <button
               onClick={() => scrollBy(-400)}
-              className="text-primary hover:text-foreground transition-colors p-1"
+              className="text-primary hover:text-foreground transition-colors p-1.5"
               aria-label="Scroll left"
             >
               <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
             </button>
             <button
               onClick={() => scrollBy(400)}
-              className="text-primary hover:text-foreground transition-colors p-1"
+              className="text-primary hover:text-foreground transition-colors p-1.5"
               aria-label="Scroll right"
             >
               <ChevronRight className="w-8 h-8" strokeWidth={2.5} />

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ExpandableText } from "@/components/ExpandableText";
 import { BookingForm } from "@/components/BookingForm";
 import { RentalCard } from "@/components/RentalCard";
 import { ServicesShowcase } from "@/components/ServicesShowcase";
@@ -71,7 +72,7 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden">
+      <section className="relative min-h-[70vh] sm:min-h-[90vh] flex flex-col justify-center overflow-hidden">
         {/* Custom SVG Filters to reduce AI-ness (Film Grain + Realism) */}
         <svg className="hidden">
           <defs>
@@ -108,9 +109,11 @@ export default function Home() {
               <span className="block text-primary text-lg sm:text-xl md:text-2xl mt-4 tracking-widest font-medium normal-case">Dear Travel Partner</span>
             </h1>
             <div className="w-16 h-1 bg-primary mb-6" />
-            <p className="text-sm sm:text-base md:text-lg mb-10 text-white/80 max-w-2xl leading-relaxed">
-              TopReasons, your trusted travel partner, is Ghana’s most trusted one-stop solution for your travel experience. From premium car hire to airport shuttle or transfer service, courier services, airport assist, fast-track visa-on-arrival services, reliable taxi services, affordable luxury accommodation and exciting tour packages; all crafted for people travelling to, within and beyond Ghana.
-            </p>
+            <ExpandableText
+              text="TopReasons, your trusted travel partner, is Ghana’s most trusted one-stop solution for your travel experience. From premium car hire to airport shuttle or transfer service, courier services, airport assist, fast-track visa-on-arrival services, reliable taxi services, affordable luxury accommodation and exciting tour packages; all crafted for people travelling to, within and beyond Ghana."
+              wrapperClassName="mb-10 max-w-2xl"
+              className="text-sm sm:text-base md:text-lg text-white/80 leading-relaxed"
+            />
             <Button
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-6 rounded-none font-bold inline-flex items-center gap-3"
               onClick={() => router.push("/cars")}
@@ -307,7 +310,7 @@ export default function Home() {
       </section>
 
       {/* Airport Transfer */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[50vh] sm:min-h-[70vh] flex items-center overflow-hidden">
         <img
           src="/assets/airport-transfer-v3.jpg"
           alt="Airport transfer service in Ghana"
@@ -336,8 +339,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Business Accounts */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
+      {/* Business Accounts — secondary B2B audience, hidden on mobile to keep the primary booking journey short */}
+      <section className="hidden sm:flex relative sm:min-h-[70vh] items-center overflow-hidden">
         <img
           src="/assets/business-account-hero.png"
           alt="Business car rental service"
@@ -371,8 +374,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Drive with TopReasons */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
+      {/* Drive with TopReasons — driver recruitment, a different audience than the typical visitor; hidden on mobile */}
+      <section className="hidden sm:flex relative sm:min-h-[70vh] items-center overflow-hidden">
         <img
           src="/assets/drive-with-us-chauffeur.png"
           alt="Drive with TopReasons mobility network"
@@ -444,8 +447,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Book Online CTA */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+      {/* Book Online CTA — a third CTA pointing at /cars (Featured Vehicles and Airport Transfer already do this); hidden on mobile to avoid repeating the same ask */}
+      <section className="hidden sm:flex relative sm:min-h-[60vh] items-center overflow-hidden">
         <img
           src="/assets/download-app.jpg"
           alt="Book online with Top Reasons"

@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ExpandableText } from "@/components/ExpandableText";
 import Link from "next/link";
 import { 
   ArrowRight, 
@@ -109,7 +110,7 @@ export default function AirportServicesPage() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] sm:h-screen sm:min-h-[700px] flex items-center justify-center overflow-hidden">
         <img 
           src="/assets/airport_hero_ghana.png"
           alt="Airport Shuttle Service" 
@@ -125,9 +126,11 @@ export default function AirportServicesPage() {
           <h1 className="text-5xl md:text-7xl font-bold mb-6 uppercase tracking-tight text-foreground">
             Airport <span className="text-primary">Services</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-            Introducing TopReasons’ airport services: Basic, Standard, Premium and Luxury. With all-inclusive pricing, and 100% service guarantee. We’ve refined our airport offering to reflect the realities of modern air travel; where clarity, and consistency matter as much as comfort and precision.
-          </p>
+          <ExpandableText
+            text="Introducing TopReasons’ airport services: Basic, Standard, Premium and Luxury. With all-inclusive pricing, and 100% service guarantee. We’ve refined our airport offering to reflect the realities of modern air travel; where clarity, and consistency matter as much as comfort and precision."
+            wrapperClassName="max-w-3xl mx-auto mb-10"
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed font-light text-center"
+          />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/cars" 

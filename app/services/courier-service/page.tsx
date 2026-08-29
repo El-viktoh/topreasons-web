@@ -164,7 +164,7 @@ export default function CourierServicePage() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] sm:h-screen sm:min-h-[700px] flex items-center justify-center overflow-hidden">
         <img 
           src="/assets/courier_hero_ghana.png"
           alt="TopReasons Courier Services" 

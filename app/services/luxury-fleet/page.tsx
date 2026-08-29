@@ -47,7 +47,7 @@ export default function StandardCarServicesPage() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] sm:h-screen sm:min-h-[700px] flex items-center justify-center overflow-hidden">
         <img 
           src="/assets/select_service_ghana.png"
           alt="Select Services" 
