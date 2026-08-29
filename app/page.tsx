@@ -12,7 +12,7 @@ import { ServicesShowcase } from "@/components/ServicesShowcase";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/lib/supabase/client";
-import { ArrowRight, Clock, ShieldCheck, Crown, MapPin } from "lucide-react";
+import { ArrowRight, Clock, ShieldCheck, Crown, MapPin, Plane, Briefcase, Car } from "lucide-react";
 import { fetchRatingsForRentals } from "@/hooks/useRentalRating";
 import {
   Carousel,
@@ -314,26 +314,30 @@ export default function Home() {
         <img
           src="/assets/airport-transfer-v3.jpg"
           alt="Airport transfer service in Ghana"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover brightness-95 contrast-105"
           loading="lazy"
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/10 z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/90 to-transparent to-70% z-[2]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 to-black/10 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 via-25% to-transparent to-55% z-[2]" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-[3]" />
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-xl">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Book Your Airport Transfer</h2>
+            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20 shadow-lg shadow-primary/10 mb-6">
+              <Plane className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            </div>
+            <p className="text-primary text-xs md:text-sm font-semibold uppercase tracking-[0.3em] mb-4">Airport Services</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Book Your<span className="block">Airport Transfer</span></h2>
             <p className="text-lg text-white/80 mb-8">
               Ready for your exciting trip to Ghana, need an airport transfer from any of Ghana’s local or international airports to your final destination? Choose from our wide range of offers: Basic, Standard, Premium and Luxury.
             </p>
             <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold group"
               onClick={() => router.push("/cars")}
             >
               Find Out More
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
@@ -344,31 +348,34 @@ export default function Home() {
         <img
           src="/assets/business-account-hero.png"
           alt="Business car rental service"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover brightness-75 contrast-105 saturate-[0.85]"
           loading="lazy"
           width={1920}
           height={1080}
         />
 
         {/* Dark gradient on the right for text, fading to completely transparent on the left so the man stays bright */}
-        <div className="absolute inset-0 bg-gradient-to-l from-background via-background/90 to-transparent w-full md:w-[70%] right-0 ml-auto z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-l from-background via-background/95 to-transparent w-full md:w-[70%] right-0 ml-auto z-[1]" />
 
-        {/* Top and Bottom blends for smooth transition between sections */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-background to-transparent z-[3]" />
+        {/* Bottom blend for smooth transition into the next section */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-[3]" />
 
         <div className="relative z-10 container mx-auto px-4 w-full">
           <div className="max-w-xl ml-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Business Accounts</h2>
+            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20 shadow-lg shadow-primary/10 mb-6">
+              <Briefcase className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            </div>
+            <p className="text-primary text-xs md:text-sm font-semibold uppercase tracking-[0.3em] mb-4">For Business</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Create Your<span className="block">Business Account</span></h2>
             <p className="text-lg text-white/80 mb-8">
               Open a TopReasons Business Account and enjoy seamless corporate travel management with a range of benefits on car hires and airport transfers, priority booking for meetings and events, plus dedicated account managers to support your travel needs, and more.
             </p>
             <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold group"
               onClick={() => router.push("/contact")}
             >
               Find Out More
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
@@ -379,18 +386,21 @@ export default function Home() {
         <img
           src="/assets/drive-with-us-chauffeur.png"
           alt="Drive with TopReasons mobility network"
-          className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
+          className="absolute inset-0 w-full h-full object-cover object-[center_30%] brightness-90 contrast-105 saturate-90"
           loading="lazy"
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/10 z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/90 to-transparent to-70% z-[2]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 via-25% to-transparent to-55% z-[2]" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-[3]" />
 
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-xl">
-            <div className="w-12 h-1 bg-primary mb-6" />
+            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20 shadow-lg shadow-primary/10 mb-6">
+              <Car className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            </div>
+            <p className="text-primary text-xs md:text-sm font-semibold uppercase tracking-[0.3em] mb-4">Join Our Fleet</p>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight text-white">Drive with TopReasons</h2>
             <p className="text-lg text-white/80 mb-8">
               Become part of Ghana’s fastest-growing premium mobility network. Whether you drive an executive saloon, a spacious SUV, or a courier van, TopReasons gives you flexible hours, steady earnings, and the backing of a brand that professionals trust.
