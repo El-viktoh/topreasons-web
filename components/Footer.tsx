@@ -16,7 +16,7 @@ export const Footer = () => {
             <SocialLinks className="justify-center" />
           </div>
 
-          <div>
+          <div className="pt-4 md:pt-6">
             <h4 className="font-semibold mb-4 uppercase tracking-widest text-xs text-primary">Services</h4>
             <ul className="space-y-3 text-sm">
               <li><Link href="/cars" className="text-muted-foreground hover:text-foreground transition-colors">Car Rental</Link></li>
@@ -26,7 +26,7 @@ export const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          <div className="pt-4 md:pt-6">
             <h4 className="font-semibold mb-4 uppercase tracking-widest text-xs text-primary">Company</h4>
             <ul className="space-y-3 text-sm">
               <li><Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>
@@ -34,7 +34,7 @@ export const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          <div className="pt-4 md:pt-6">
             <h4 className="font-semibold mb-4 uppercase tracking-widest text-xs text-primary">Support</h4>
             <ul className="space-y-3 text-sm">
               <li><Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Help Center</Link></li>
