@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SocialLinks } from "./SocialLinks";
 
 export const Footer = () => {
   return (
@@ -9,9 +10,10 @@ export const Footer = () => {
             <Link href="/" className="flex items-center justify-center gap-2 mb-1">
               <img src="/assets/logo.png" alt="Top Reasons" className="h-20 md:h-24" />
             </Link>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Ghana's trusted car rental service — quality vehicles, affordable rates, reliable service.
             </p>
+            <SocialLinks className="justify-center" />
           </div>
 
           <div>

@@ -210,11 +210,13 @@ export default function RentalDetail() {
               </div>
             )}
 
-            {rental.features && rental.features.length > 0 && (
+            {rental.features && rental.features.filter(f => !f.startsWith("category:")).length > 0 && (
               <div>
                 <h2 className="text-xl font-semibold mb-3">Features</h2>
                 <div className="flex flex-wrap gap-2">
-                  {rental.features.map((feature, index) => (
+                  {rental.features
+                    .filter(feature => !feature.startsWith("category:"))
+                    .map((feature, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       {feature}

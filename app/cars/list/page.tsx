@@ -79,7 +79,7 @@ function CarsListContent() {
       else if (priceRange === "premium") matchesPrice = rental.price_per_day >= 2500;
       
       const rentalCategory = rental.features?.find(f => f.startsWith('category:'))?.replace('category:', '') || rental.type;
-      const matchesCategory = category === "ALL" || rentalCategory === category;
+      const matchesCategory = category === "ALL" || (rentalCategory || "").toUpperCase() === category.toUpperCase();
       return matchesSearch && matchesPrice && matchesCategory;
     })
     .sort((a, b) => {

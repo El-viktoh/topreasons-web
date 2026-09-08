@@ -122,17 +122,7 @@ export const RentalCard = ({
             )}
           </div>
 
-          {/* Features Grid (2x2) */}
-          <div className="grid grid-cols-2 gap-y-3 gap-x-2">
-            {features.slice(0, 4).map((feature, index) => {
-              // Basic parsing to split feature into label/value if possible, otherwise just show it
-              return (
-                <div key={index} className="flex items-center text-muted-foreground text-[11px] font-medium tracking-wide">
-                  <span className="truncate">{feature}</span>
-                </div>
-              );
-            })}
-          </div>
+
         </div>
 
         {/* Footer Row (Price & Book Now) */}

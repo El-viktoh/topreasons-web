@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Mail, Phone, MapPin, Clock, ArrowRight } from "lucide-react";
+import { SocialLinks } from "@/components/SocialLinks";
 
 const contactInfo = [
   { icon: Mail, title: "Email Us", content: "inquiries@topreasonsco.com", description: "For general inquiries" },
@@ -148,13 +149,13 @@ export default function Contact() {
               </form>
             </div>
 
-            <div>
+            <div className="text-center md:text-left">
               <h2 className="text-2xl font-bold mb-8 uppercase tracking-tight">
                 Frequently Asked<span className="text-primary"> Questions</span>
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-4 text-left md:text-left">
                 {faqs.map((faq, index) => (
-                  <div key={index} className="p-6 bg-card border border-border rounded-sm">
+                  <div key={index} className="p-6 bg-card border border-border rounded-sm text-center md:text-left">
                     <h3 className="font-bold mb-2 text-sm uppercase tracking-wide">{faq.question}</h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">{faq.answer}</p>
                   </div>
