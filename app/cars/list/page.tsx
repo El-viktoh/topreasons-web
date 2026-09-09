@@ -18,6 +18,7 @@ interface Rental {
   location: string;
   price_per_day: number;
   image_url: string | null;
+  images: string[] | null;
   type: string;
   features: string[] | null;
   available: boolean | null;

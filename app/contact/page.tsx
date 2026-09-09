@@ -72,6 +72,10 @@ export default function Contact() {
               );
             })}
           </div>
+          <div className="flex flex-col items-center mt-10">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Follow Us</p>
+            <SocialLinks />
+          </div>
         </div>
       </section>
 

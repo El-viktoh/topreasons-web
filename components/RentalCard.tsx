@@ -16,7 +16,7 @@ interface RentalCardProps {
   rating?: number;
   reviewCount?: number;
   image: string;
-  images?: string[];
+  images?: string[] | null;
   type: string;
   features: string[];
   available: boolean;
