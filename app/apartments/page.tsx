@@ -154,6 +154,7 @@ export default function Apartments() {
                       rating={ratingData?.averageRating}
                       reviewCount={ratingData?.reviewCount}
                       image={rental.image_url || "/placeholder.svg"}
+                      images={rental.images}
                       type="apartment"
                       features={rental.features || []}
                       available={rental.available ?? true}

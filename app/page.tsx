@@ -281,6 +281,7 @@ export default function Home() {
                           rating={ratingData?.averageRating}
                           reviewCount={ratingData?.reviewCount}
                           image={rental.image_url || "/placeholder.svg"}
+                          images={rental.images}
                           type={rentalCategory}
                           features={displayFeatures}
                           available={rental.available ?? true}

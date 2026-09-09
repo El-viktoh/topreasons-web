@@ -185,6 +185,7 @@ function CarsListContent() {
                     rating={ratingData.averageRating}
                     reviewCount={ratingData.reviewCount}
                     image={rental.image_url || "/assets/service_business_v3.png"}
+                    images={rental.images}
                     type={rentalCategory}
                     features={displayFeatures}
                     available={rental.available ?? true}
