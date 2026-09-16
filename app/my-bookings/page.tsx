@@ -158,7 +158,7 @@ export default function MyBookings() {
       customizations: {
         title: "TopReasons Booking",
         description: `Payment for ${booking.rental?.title || "Rental"}`,
-        logo: "https://topreasons-web.vercel.app/logo.png",
+        logo: "https://topreasons-web.vercel.app/assets/logo.png",
       },
     });
 

@@ -67,7 +67,7 @@ export default function Booking() {
     customizations: {
       title: "TopReasons Booking",
       description: `Payment for ${rental?.title || "Rental"}`,
-      logo: "https://topreasons-web.vercel.app/logo.png",
+      logo: "https://topreasons-web.vercel.app/assets/logo.png",
     },
   });
 
