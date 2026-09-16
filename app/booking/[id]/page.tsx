@@ -20,6 +20,16 @@ import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 export default function Booking() {
   const params = useParams();
   const id = params.id as string;
@@ -128,7 +138,9 @@ export default function Booking() {
 
     setBooking(true);
     try {
+      const bookingId = generateUUID();
       const payload: any = {
+        id: bookingId,
         rental_id: id,
         start_date: format(dateRange.from, "yyyy-MM-dd"),
         end_date: format(dateRange.to, "yyyy-MM-dd"),
@@ -145,7 +157,7 @@ export default function Booking() {
         payload.guest_phone = guestPhone;
       }
 
-      const { data: newBooking, error } = await supabase.from("bookings").insert(payload).select().single();
+      const { error } = await supabase.from("bookings").insert(payload);
       if (error) throw error;
 
       await supabase.functions.invoke("send-booking-confirmation", {
@@ -171,7 +183,7 @@ export default function Booking() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   transaction_id: response.transaction_id,
-                  booking_id: newBooking.id
+                  booking_id: bookingId
                 })
               });
               const data = await res.json();
