@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Car, Home, Info, AlertCircle } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import Link from "next/link";
+import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -35,6 +36,30 @@ export default function Booking() {
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
+
+  const calculateTotal = () => {
+    if (!dateRange?.from || !dateRange?.to || !rental) return 0;
+    const days = differenceInDays(dateRange.to, dateRange.from);
+    return days * rental.price_per_day;
+  };
+
+  const handleFlutterPayment = useFlutterwave({
+    public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY || "",
+    tx_ref: `booking-${id}-${Date.now()}`,
+    amount: calculateTotal(),
+    currency: "GHS",
+    payment_options: "card,mobilemoney,ussd",
+    customer: {
+      email: user?.email || guestEmail,
+      phone_number: profile?.phone || guestPhone || "",
+      name: profile?.full_name || guestName || "Guest User",
+    },
+    customizations: {
+      title: "TopReasons Booking",
+      description: `Payment for ${rental?.title || "Rental"}`,
+      logo: "https://topreasons-web.vercel.app/logo.png",
+    },
+  });
 
   useEffect(() => {
     checkUser();
@@ -81,12 +106,6 @@ export default function Booking() {
     }
   };
 
-  const calculateTotal = () => {
-    if (!dateRange?.from || !dateRange?.to || !rental) return 0;
-    const days = differenceInDays(dateRange.to, dateRange.from);
-    return days * rental.price_per_day;
-  };
-
   const handleBooking = async () => {
     if (!dateRange?.from || !dateRange?.to) {
       toast.error("Please select dates");
@@ -126,7 +145,7 @@ export default function Booking() {
         payload.guest_phone = guestPhone;
       }
 
-      const { error } = await supabase.from("bookings").insert(payload);
+      const { data: newBooking, error } = await supabase.from("bookings").insert(payload).select().single();
       if (error) throw error;
 
       await supabase.functions.invoke("send-booking-confirmation", {
@@ -140,13 +159,49 @@ export default function Booking() {
         },
       });
 
-      toast.success("Booking created successfully! Check your email for confirmation.");
-      router.push("/");
+      toast.success("Booking created! Initializing payment...");
+
+      handleFlutterPayment({
+        callback: async (response) => {
+          if (response.status === "successful") {
+            try {
+              toast.loading("Verifying payment...", { id: "verify-payment" });
+              const res = await fetch("/api/payment/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  transaction_id: response.transaction_id,
+                  booking_id: newBooking.id
+                })
+              });
+              const data = await res.json();
+              if (res.ok && data.success) {
+                toast.success("Payment successful! Booking confirmed.", { id: "verify-payment" });
+                closePaymentModal();
+                router.push(user ? "/my-bookings" : "/");
+              } else {
+                toast.error("Payment verification failed.", { id: "verify-payment" });
+                router.push(user ? "/my-bookings" : "/");
+              }
+            } catch (err) {
+              toast.error("An error occurred during verification.", { id: "verify-payment" });
+              router.push(user ? "/my-bookings" : "/");
+            }
+          } else {
+            router.push(user ? "/my-bookings" : "/");
+          }
+        },
+        onClose: () => {
+          toast.info("Payment cancelled. You can pay later from your bookings page.");
+          router.push(user ? "/my-bookings" : "/");
+        },
+      });
+
     } catch (error: any) {
       toast.error(error.message || "Failed to create booking");
-    } finally {
       setBooking(false);
     }
+    // Note: We don't setBooking(false) in the success path immediately because the payment modal will be open.
   };
 
   const isCar = rental?.type === "car";

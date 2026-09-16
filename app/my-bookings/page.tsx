@@ -14,6 +14,7 @@ import { Calendar, MapPin, Clock, CheckCircle, XCircle, Loader2, Car, Home, Arro
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { ReviewForm } from "@/components/ReviewForm";
+import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
 
 interface Booking {
   id: string;
@@ -41,6 +42,8 @@ export default function MyBookings() {
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviewBooking, setReviewBooking] = useState<Booking | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     checkAuthAndFetch();
@@ -53,6 +56,21 @@ export default function MyBookings() {
       router.push("/auth");
       return;
     }
+    setUser(user);
+    
+    try {
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profileData) {
+        setProfile(profileData);
+      }
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
+    }
+
     await fetchBookings(user.id);
     setLoading(false);
   };
@@ -123,6 +141,65 @@ export default function MyBookings() {
   const getRentalImage = (booking: Booking) => {
     if (booking.rental?.images && booking.rental.images.length > 0) return booking.rental.images[0];
     return booking.rental?.image_url || "/placeholder.svg";
+  };
+
+  const PaymentButton = ({ booking }: { booking: Booking }) => {
+    const handleFlutterPayment = useFlutterwave({
+      public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY || "",
+      tx_ref: `booking-${booking.id}-${Date.now()}`,
+      amount: booking.total_price,
+      currency: "GHS",
+      payment_options: "card,mobilemoney,ussd",
+      customer: {
+        email: user?.email || "",
+        phone_number: profile?.phone || "",
+        name: profile?.full_name || "Guest User",
+      },
+      customizations: {
+        title: "TopReasons Booking",
+        description: `Payment for ${booking.rental?.title || "Rental"}`,
+        logo: "https://topreasons-web.vercel.app/logo.png",
+      },
+    });
+
+    return (
+      <Button
+        size="sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleFlutterPayment({
+            callback: async (response) => {
+              if (response.status === "successful") {
+                try {
+                  toast.loading("Verifying payment...", { id: "verify-payment" });
+                  const res = await fetch("/api/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      transaction_id: response.transaction_id,
+                      booking_id: booking.id,
+                    }),
+                  });
+                  const data = await res.json();
+                  if (res.ok && data.success) {
+                    toast.success("Payment successful!", { id: "verify-payment" });
+                    closePaymentModal();
+                    if (user) fetchBookings(user.id);
+                  } else {
+                    toast.error("Payment verification failed.", { id: "verify-payment" });
+                  }
+                } catch (err) {
+                  toast.error("An error occurred during verification.", { id: "verify-payment" });
+                }
+              }
+            },
+            onClose: () => {},
+          });
+        }}
+      >
+        Pay Now
+      </Button>
+    );
   };
 
   if (loading) {
@@ -238,6 +315,9 @@ export default function MyBookings() {
                               <Button size="sm" variant="outline" onClick={() => router.push(`/rental/${booking.rental_id}`)}>
                                 View Rental
                               </Button>
+                              {booking.payment_status === "pending" && (
+                                <PaymentButton booking={booking} />
+                              )}
                               {canReview(booking) && (
                                 <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); setReviewBooking(booking); }}>
                                   <Star className="w-4 h-4 mr-1" />
