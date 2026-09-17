@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "npm:resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,24 +10,26 @@ const corsHeaders = {
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 5; // 5 requests per minute per user
+const MAX_REQUESTS_PER_WINDOW = 5; // 5 requests per minute per client
 
 // In-memory rate limit store (resets on function cold start)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-const checkRateLimit = (userId: string): { allowed: boolean; retryAfter?: number } => {
+// Bookings can be made by guests (no session), so we rate-limit by client IP
+// rather than requiring an authenticated user.
+const checkRateLimit = (clientKey: string): { allowed: boolean; retryAfter?: number } => {
   const now = Date.now();
-  const userLimit = rateLimitStore.get(userId);
+  const clientLimit = rateLimitStore.get(clientKey);
 
   // Clean up expired entries
-  if (userLimit && now > userLimit.resetTime) {
-    rateLimitStore.delete(userId);
+  if (clientLimit && now > clientLimit.resetTime) {
+    rateLimitStore.delete(clientKey);
   }
 
-  const currentLimit = rateLimitStore.get(userId);
+  const currentLimit = rateLimitStore.get(clientKey);
 
   if (!currentLimit) {
-    rateLimitStore.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    rateLimitStore.set(clientKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     return { allowed: true };
   }
 
@@ -66,6 +70,7 @@ interface BookingEmailRequest {
   startDate: string;
   endDate: string;
   totalPrice: number;
+  driveOption?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -74,47 +79,25 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Verify authentication
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Missing authorization header" }),
-        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    // Check rate limit
-    const { allowed, retryAfter } = checkRateLimit(user.id);
+    // Rate-limit by client IP (bookings can come from guests with no session)
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+    const { allowed, retryAfter } = checkRateLimit(clientIp);
     if (!allowed) {
       return new Response(
         JSON.stringify({ error: "Too many requests. Please try again later." }),
-        { 
-          status: 429, 
-          headers: { 
-            "Content-Type": "application/json", 
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
             "Retry-After": String(retryAfter),
-            ...corsHeaders 
-          } 
+            ...corsHeaders
+          }
         }
       );
     }
 
     const body = await req.json();
-    const { email, rentalTitle, startDate, endDate, totalPrice }: BookingEmailRequest = body;
+    const { email, rentalTitle, startDate, endDate, totalPrice, driveOption }: BookingEmailRequest = body;
 
     // Validate inputs
     if (!isValidEmail(email)) {
@@ -149,51 +132,39 @@ const handler = async (req: Request): Promise<Response> => {
     const sanitizedTitle = sanitizeString(rentalTitle, 200);
     const sanitizedStartDate = sanitizeString(startDate, 50);
     const sanitizedEndDate = sanitizeString(endDate, 50);
+    const sanitizedDriveOption = driveOption ? sanitizeString(driveOption, 50) : '';
 
-    // TODO: When Resend API key is added, uncomment this:
-    // const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    // if (!RESEND_API_KEY) {
-    //   throw new Error("RESEND_API_KEY not configured");
-    // }
+    const emailResponse = await resend.emails.send({
+      from: "Top Reasons <enquiries@topreasonsco.com>",
+      to: [email],
+      subject: "Booking Confirmation - " + sanitizedTitle,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); padding: 30px; border-radius: 12px; margin-bottom: 20px;">
+            <h1 style="color: #d4af37; margin: 0;">Top Reasons</h1>
+          </div>
+          <h2 style="color: #333;">Booking Received!</h2>
+          <p>Thank you for your booking with Top Reasons. We're processing your payment and will confirm shortly.</p>
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #333;">Booking Details</h3>
+            <p><strong>Rental:</strong> ${sanitizedTitle}</p>
+            <p><strong>Check-in:</strong> ${sanitizedStartDate}</p>
+            <p><strong>Check-out:</strong> ${sanitizedEndDate}</p>
+            ${sanitizedDriveOption ? `<p><strong>Drive Option:</strong> ${sanitizedDriveOption}</p>` : ''}
+            <p><strong>Total:</strong> GHS ${totalPrice.toFixed(2)}</p>
+          </div>
+          <p>We look forward to serving you!</p>
+          <p style="color: #666; font-size: 14px;">- The Top Reasons Team</p>
+        </div>
+      `,
+    });
 
-    // const res = await fetch("https://api.resend.com/emails", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Authorization: `Bearer ${RESEND_API_KEY}`,
-    //   },
-    //   body: JSON.stringify({
-    //     from: "Top Reasons <onboarding@resend.dev>",
-    //     to: [email],
-    //     subject: "Booking Confirmation - " + sanitizedTitle,
-    //     html: `
-    //       <h1>Booking Confirmed!</h1>
-    //       <p>Thank you for your booking with Top Reasons.</p>
-    //       <h2>Booking Details:</h2>
-    //       <ul>
-    //         <li><strong>Rental:</strong> ${sanitizedTitle}</li>
-    //         <li><strong>Check-in:</strong> ${sanitizedStartDate}</li>
-    //         <li><strong>Check-out:</strong> ${sanitizedEndDate}</li>
-    //         <li><strong>Total:</strong> $${totalPrice.toFixed(2)}</li>
-    //       </ul>
-    //       <p>We look forward to serving you!</p>
-    //     `,
-    //   }),
-    // });
-
-    // const data = await res.json();
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Email functionality ready. Add RESEND_API_KEY secret to enable." 
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    return new Response(JSON.stringify({ success: true, data: emailResponse }), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   } catch (error: any) {
+    console.error("send-booking-confirmation error:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       {

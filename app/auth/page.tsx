@@ -178,7 +178,7 @@ export default function Auth() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -187,8 +187,16 @@ export default function Auth() {
         },
       });
       if (error) throw error;
-      toast.success("Account created successfully!");
-      router.push("/");
+
+      if (data.session) {
+        // Email confirmation is disabled on this project, or auto-confirmed
+        toast.success("Account created successfully!");
+        router.push("/");
+      } else {
+        // Email confirmation is required before the account can sign in
+        toast.success("Account created! Check your email to confirm your address before signing in.");
+        handleTabChange("signin");
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign up");
     } finally {
