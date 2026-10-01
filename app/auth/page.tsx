@@ -239,6 +239,10 @@ export default function Auth() {
         // Auto-confirmed or confirmations off
         toast.success("Account created successfully!");
         router.push("/");
+      } else if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+        // Supabase returns an empty identities array when the email is already registered
+        toast.info("An account with this email already exists. Please sign in instead.");
+        handleTabChange("signin");
       } else {
         // Email verification is required!
         setPendingVerificationEmail(email);
