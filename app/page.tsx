@@ -1,7 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -10,10 +7,9 @@ import { BookingForm } from "@/components/BookingForm";
 import { RentalCard } from "@/components/RentalCard";
 import { ServicesShowcase } from "@/components/ServicesShowcase";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { ArrowRight, Clock, ShieldCheck, Crown, MapPin, Plane, Briefcase, Car } from "lucide-react";
-import { fetchRatingsForRentals } from "@/hooks/useRentalRating";
+import { fetchRatingsForRentals } from "@/lib/ratings";
 import {
   Carousel,
   CarouselContent,
@@ -39,34 +35,26 @@ interface RatingData {
   reviewCount: number;
 }
 
-export default function Home() {
-  const router = useRouter();
-  const [featuredRentals, setFeaturedRentals] = useState<Rental[]>([]);
-  const [ratings, setRatings] = useState<Map<string, RatingData>>(new Map());
-  const [loading, setLoading] = useState(true);
+async function getFeaturedRentals(): Promise<{ rentals: Rental[]; ratings: Map<string, RatingData> }> {
+  // Fetch a larger pool of available rentals
+  const { data, error } = await supabase
+    .from("rentals")
+    .select("*")
+    .eq("available", true)
+    .limit(20);
 
-  useEffect(() => {
-    fetchFeaturedRentals();
-  }, []);
+  if (error || !data || data.length === 0) {
+    return { rentals: [], ratings: new Map() };
+  }
 
-  const fetchFeaturedRentals = async () => {
-    // Fetch a larger pool of available rentals
-    const { data, error } = await supabase
-      .from("rentals")
-      .select("*")
-      .eq("available", true)
-      .limit(20);
+  // Shuffle the rentals randomly
+  const shuffledData = [...data].sort(() => 0.5 - Math.random());
+  const ratingsMap = await fetchRatingsForRentals(shuffledData.map((r) => r.id));
+  return { rentals: shuffledData, ratings: ratingsMap };
+}
 
-    if (!error && data && data.length > 0) {
-      // Shuffle the rentals randomly
-      const shuffledData = [...data].sort(() => 0.5 - Math.random());
-      
-      setFeaturedRentals(shuffledData);
-      const ratingsMap = await fetchRatingsForRentals(shuffledData.map((r) => r.id));
-      setRatings(ratingsMap);
-    }
-    setLoading(false);
-  };
+export default async function Home() {
+  const { rentals: featuredRentals, ratings } = await getFeaturedRentals();
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,11 +104,13 @@ export default function Home() {
               className="text-sm sm:text-base md:text-lg text-white/80 leading-relaxed"
             />
             <Button
+              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-6 rounded-none font-bold inline-flex items-center gap-3"
-              onClick={() => router.push("/cars")}
             >
-              Book Now
-              <ArrowRight className="w-4 h-4" />
+              <Link href="/cars">
+                Book Now
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -248,17 +238,7 @@ export default function Home() {
           <p className="text-muted-foreground text-center mb-10 max-w-xl mx-auto">
             A snapshot of our top-rated fleet — browse the full lineup anytime.
           </p>
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="h-48 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : featuredRentals.length > 0 ? (
+          {featuredRentals.length > 0 ? (
             <div className="relative px-6 sm:px-12 md:px-16 lg:px-20">
               <Carousel
                 opts={{
@@ -302,10 +282,10 @@ export default function Home() {
           )}
           <div className="flex justify-center mt-10">
             <Button
+              asChild
               className="bg-transparent border border-primary text-primary hover:bg-primary hover:text-primary-foreground uppercase tracking-widest text-xs px-8 py-6 rounded-sm font-bold transition-all duration-300"
-              onClick={() => router.push("/cars")}
             >
-              See Our Offers
+              <Link href="/cars">See Our Offers</Link>
             </Button>
           </div>
         </div>
@@ -335,11 +315,13 @@ export default function Home() {
               Ready for your exciting trip to Ghana, need an airport transfer from any of Ghana’s local or international airports to your final destination? Choose from our wide range of offers: Basic, Standard, Premium and Luxury.
             </p>
             <Button
+              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold group"
-              onClick={() => router.push("/cars")}
             >
-              Find Out More
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              <Link href="/cars">
+                Find Out More
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -373,11 +355,13 @@ export default function Home() {
               Open a TopReasons Business Account and enjoy seamless corporate travel management with a range of benefits on car hires and airport transfers, priority booking for meetings and events, plus dedicated account managers to support your travel needs, and more.
             </p>
             <Button
+              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold group"
-              onClick={() => router.push("/contact")}
             >
-              Find Out More
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              <Link href="/contact">
+                Find Out More
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -408,11 +392,13 @@ export default function Home() {
               Become part of Ghana’s fastest-growing premium mobility network. Whether you drive an executive saloon, a spacious SUV, or a courier van, TopReasons gives you flexible hours, steady earnings, and the backing of a brand that professionals trust.
             </p>
             <Button
+              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold group"
-              onClick={() => router.push("/driver-application")}
             >
-              Apply Now
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              <Link href="/driver-application">
+                Apply Now
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -482,11 +468,13 @@ export default function Home() {
               reliable, and hassle-free.
             </p>
             <Button
+              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold"
-              onClick={() => router.push("/cars")}
             >
-              Browse Cars
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <Link href="/cars">
+                Browse Cars
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -508,12 +496,14 @@ export default function Home() {
             from dedicated accounts with centralised booking and priority service.
           </p>
           <Button
+            asChild
             variant="outline"
             className="uppercase tracking-widest text-sm px-8 py-5 rounded-sm font-semibold border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
-            onClick={() => router.push("/about")}
           >
-            Learn More
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <Link href="/about">
+              Learn More
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
           </Button>
         </div>
       </section>

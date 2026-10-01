@@ -136,25 +136,43 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Top Reasons <enquiries@topreasonsco.com>",
+      reply_to: "enquiries@topreasonsco.com",
       to: [email],
-      subject: "Booking Confirmation - " + sanitizedTitle,
+      subject: "Booking Received - " + sanitizedTitle,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); padding: 30px; border-radius: 12px; margin-bottom: 20px;">
-            <h1 style="color: #d4af37; margin: 0;">Top Reasons</h1>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0b0f17; color: #e2e8f0; border-radius: 12px; overflow: hidden; border: 1px solid #1f293d;">
+          <div style="height: 4px; background: linear-gradient(90deg, #996515 0%, #d4af37 50%, #f6e27a 100%);"></div>
+          <div style="padding: 28px 32px 20px 32px; text-align: center; border-bottom: 1px solid #161d2b;">
+            <a href="https://topreasonsco.com" target="_blank" style="text-decoration: none; display: inline-block;">
+              <img src="https://topreasonsco.com/assets/logo.png" alt="Top Reasons" width="150" style="display: block; margin: 0 auto 6px auto;" />
+            </a>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #d4af37; text-transform: uppercase;">
+              Premier Fleet &bull; Ghana
+            </span>
           </div>
-          <h2 style="color: #333;">Booking Received!</h2>
-          <p>Thank you for your booking with Top Reasons. We're processing your payment and will confirm shortly.</p>
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #333;">Booking Details</h3>
-            <p><strong>Rental:</strong> ${sanitizedTitle}</p>
-            <p><strong>Check-in:</strong> ${sanitizedStartDate}</p>
-            <p><strong>Check-out:</strong> ${sanitizedEndDate}</p>
-            ${sanitizedDriveOption ? `<p><strong>Drive Option:</strong> ${sanitizedDriveOption}</p>` : ''}
-            <p><strong>Total:</strong> GHS ${totalPrice.toFixed(2)}</p>
+          <div style="padding: 32px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <span style="font-size: 28px; line-height: 1;">🎉</span>
+              <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 12px 0 6px 0;">Booking Received!</h1>
+              <p style="color: #94a3b8; font-size: 14px; margin: 0;">Thank you for booking with Top Reasons. We are reviewing your reservation.</p>
+            </div>
+            <div style="background-color: #111722; padding: 20px; border-radius: 8px; border: 1px solid #1f2a3e; margin: 24px 0;">
+              <h2 style="margin-top: 0; color: #d4af37; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Reservation Details</h2>
+              <table style="width: 100%; font-size: 13px; color: #cbd5e1; border-collapse: collapse;">
+                <tr><td style="padding: 6px 0; color: #94a3b8;">Vehicle / Service:</td><td style="padding: 6px 0; text-align: right; font-weight: 600; color: #ffffff;">${sanitizedTitle}</td></tr>
+                <tr><td style="padding: 6px 0; color: #94a3b8;">Check-in:</td><td style="padding: 6px 0; text-align: right;">${sanitizedStartDate}</td></tr>
+                <tr><td style="padding: 6px 0; color: #94a3b8;">Check-out:</td><td style="padding: 6px 0; text-align: right;">${sanitizedEndDate}</td></tr>
+                ${sanitizedDriveOption ? `<tr><td style="padding: 6px 0; color: #94a3b8;">Drive Option:</td><td style="padding: 6px 0; text-align: right;">${sanitizedDriveOption}</td></tr>` : ''}
+                <tr><td style="padding: 6px 0; color: #94a3b8;">Total:</td><td style="padding: 6px 0; text-align: right; font-weight: 700; color: #d4af37;">GHS ${totalPrice.toFixed(2)}</td></tr>
+              </table>
+            </div>
+            <p style="font-size: 13px; color: #94a3b8; line-height: 20px;">
+              Our concierge team is at your disposal. If you have questions or special requirements, email us at <a href="mailto:enquiries@topreasonsco.com" style="color: #d4af37; text-decoration: none;">enquiries@topreasonsco.com</a>.
+            </p>
           </div>
-          <p>We look forward to serving you!</p>
-          <p style="color: #666; font-size: 14px;">- The Top Reasons Team</p>
+          <div style="padding: 20px; background-color: #070a10; text-align: center; border-top: 1px solid #141b27; font-size: 11px; color: #64748b;">
+            Top Reasons Car Rentals &bull; Accra, Ghana &bull; enquiries@topreasonsco.com
+          </div>
         </div>
       `,
     });

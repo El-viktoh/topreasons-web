@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, User, Building2, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, User, Building2, Loader2, CheckCircle, XCircle, Mail, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { signInSchema, signUpSchema, resetEmailSchema, newPasswordSchema } from "@/lib/validation";
 
@@ -27,6 +27,13 @@ export default function Auth() {
   const [activeTab, setActiveTab] = useState("signin");
   const [newPassword, setNewPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
+  // Email verification state
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isResending, setIsResending] = useState(false);
+
   const [passwordChecks, setPasswordChecks] = useState({
     length: false,
     uppercase: false,
@@ -63,8 +70,18 @@ export default function Auth() {
     };
   }, []);
 
+  // Cooldown countdown effect
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    setUnconfirmedEmail(null);
     const url = new URL(window.location.href);
     url.searchParams.set("tab", value);
     window.history.pushState(null, '', url.toString());
@@ -121,9 +138,31 @@ export default function Auth() {
     }
   };
 
+  const handleResendVerification = async (targetEmail: string) => {
+    if (resendCooldown > 0 || isResending) return;
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: targetEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        },
+      });
+      if (error) throw error;
+      toast.success("Fresh verification link sent! Check your inbox.");
+      setResendCooldown(60);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to resend verification email");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationErrors({});
+    setUnconfirmedEmail(null);
     setIsLoading(true);
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
@@ -142,7 +181,15 @@ export default function Auth() {
 
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      if (error) {
+        // Specifically detect email not confirmed error
+        const errMsg = error.message.toLowerCase();
+        if (errMsg.includes("email not confirmed") || errMsg.includes("email_not_confirmed")) {
+          setUnconfirmedEmail(email);
+          throw new Error("Your email has not been verified yet. Please check your inbox or resend the verification link.");
+        }
+        throw error;
+      }
       toast.success("Signed in successfully!");
       router.push("/");
     } catch (error: any) {
@@ -182,20 +229,21 @@ export default function Auth() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
           data: { full_name: fullName },
         },
       });
       if (error) throw error;
 
       if (data.session) {
-        // Email confirmation is disabled on this project, or auto-confirmed
+        // Auto-confirmed or confirmations off
         toast.success("Account created successfully!");
         router.push("/");
       } else {
-        // Email confirmation is required before the account can sign in
-        toast.success("Account created! Check your email to confirm your address before signing in.");
-        handleTabChange("signin");
+        // Email verification is required!
+        setPendingVerificationEmail(email);
+        setResendCooldown(60);
+        toast.success("Account created! Verification email sent.");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign up");
@@ -263,6 +311,76 @@ export default function Auth() {
               </form>
             </CardContent>
           </Card>
+        ) : pendingVerificationEmail ? (
+          /* VERIFICATION PENDING STATE AFTER SIGNUP */
+          <Card className="border-primary/40 bg-card shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-primary to-yellow-300" />
+            <CardHeader className="text-center pt-8 pb-3">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                <Mail className="w-8 h-8 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-bold tracking-tight">Verify Your Email</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                We've sent a verification link to your inbox.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-center pb-6">
+              <div className="p-3 bg-secondary/60 rounded-md border border-border text-xs text-muted-foreground">
+                Sent to: <strong className="text-foreground">{pendingVerificationEmail}</strong>
+                <br />
+                From: <span className="text-primary font-medium">enquiries@topreasonsco.com</span>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Click the confirmation link inside the email to activate your account. If you don't see it within a couple of minutes, please check your spam or junk folder.
+              </p>
+
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={() => handleResendVerification(pendingVerificationEmail)}
+                  disabled={isResending || resendCooldown > 0}
+                >
+                  {isResending ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      Sending fresh link...
+                    </>
+                  ) : resendCooldown > 0 ? (
+                    `Resend email in ${resendCooldown}s`
+                  ) : (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 mr-2" />
+                      Resend Verification Email
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-2 pt-0 border-t border-border pt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs"
+                onClick={() => {
+                  setPendingVerificationEmail(null);
+                  handleTabChange("signin");
+                }}
+              >
+                Already verified? Sign In
+              </Button>
+              <button
+                type="button"
+                onClick={() => setPendingVerificationEmail(null)}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Use a different email address
+              </button>
+            </CardFooter>
+          </Card>
         ) : (
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
@@ -277,6 +395,40 @@ export default function Auth() {
                   <CardDescription>Sign in to access your account and manage your rentals.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* UNCONFIRMED EMAIL NOTICE WITH 1-CLICK RESEND */}
+                  {unconfirmedEmail && (
+                    <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-md text-xs space-y-2">
+                      <div className="flex items-start gap-2 text-amber-400">
+                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                        <div>
+                          <strong>Email Verification Required</strong>
+                          <p className="text-muted-foreground mt-0.5">
+                            Your account is not verified yet. Check your inbox for the link from enquiries@topreasonsco.com.
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="w-full text-xs h-8"
+                        onClick={() => handleResendVerification(unconfirmedEmail)}
+                        disabled={isResending || resendCooldown > 0}
+                      >
+                        {isResending ? (
+                          <>
+                            <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                            Sending link...
+                          </>
+                        ) : resendCooldown > 0 ? (
+                          `Resend available in ${resendCooldown}s`
+                        ) : (
+                          "Resend Verification Email"
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="signin-email">Email</Label>
@@ -371,7 +523,7 @@ export default function Auth() {
                   </form>
                 </CardContent>
                 <CardFooter className="text-sm text-muted-foreground text-center">
-                  By signing up, you agree to our Terms of Service and Privacy Policy.
+                  By signing up, you agree to our Terms of Service and Privacy Policy. A verification email will be sent to your address.
                 </CardFooter>
               </Card>
             </TabsContent>

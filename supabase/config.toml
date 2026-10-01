@@ -1,5 +1,23 @@
 project_id = "hiapancqatgpacmgmfpd"
 
+[auth]
+site_url = "https://topreasonsco.com"
+additional_redirect_urls = [
+  "https://topreasonsco.com/auth/confirm",
+  "http://localhost:3000/auth/confirm",
+  "http://localhost:3001/auth/confirm"
+]
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+smtp_admin_email = "enquiries@topreasonsco.com"
+smtp_sender_name = "Top Reasons"
+
+[auth.email.template.confirmation]
+subject = "Confirm your Top Reasons account"
+content_path = "./templates/confirm_signup.html"
+
 [functions.send-booking-confirmation]
 verify_jwt = false
 
