@@ -46,6 +46,9 @@ export default function Booking() {
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
+  // Created once per visit so the payment reference (tx_ref) and the booking row share
+  // the same id; the server uses that to tie a payment to exactly one booking.
+  const [bookingId] = useState(() => generateUUID());
 
   const calculateTotal = () => {
     if (!dateRange?.from || !dateRange?.to || !rental) return 0;
@@ -55,7 +58,7 @@ export default function Booking() {
 
   const handleFlutterPayment = useFlutterwave({
     public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY || "",
-    tx_ref: `booking-${id}-${Date.now()}`,
+    tx_ref: `booking-${bookingId}-${Date.now()}`,
     amount: calculateTotal(),
     currency: "GHS",
     payment_options: "card,mobilemoney,ussd",
@@ -138,7 +141,6 @@ export default function Booking() {
 
     setBooking(true);
     try {
-      const bookingId = generateUUID();
       const payload: any = {
         id: bookingId,
         rental_id: id,
@@ -158,7 +160,8 @@ export default function Booking() {
       }
 
       const { error } = await supabase.from("bookings").insert(payload);
-      if (error) throw error;
+      // 23505 = this visit already created the booking (e.g. a retry); carry on to payment
+      if (error && error.code !== "23505") throw error;
 
       await supabase.functions.invoke("send-booking-confirmation", {
         body: {

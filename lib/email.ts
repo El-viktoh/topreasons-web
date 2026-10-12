@@ -297,6 +297,14 @@ export function generateVerificationEmailHtml({
 </html>`;
 }
 
+const escapeHtml = (value: unknown): string =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 export interface PaymentReceiptEmailData {
   customerName?: string;
   rentalTitle: string;
@@ -315,7 +323,23 @@ export interface PaymentReceiptEmailData {
 /**
  * Generates the HTML template for Payment Confirmation & Receipt Email
  */
-export function generatePaymentReceiptEmailHtml(data: PaymentReceiptEmailData) {
+export function generatePaymentReceiptEmailHtml(rawData: PaymentReceiptEmailData) {
+  // Names, titles and references can be typed by customers (and this same HTML is
+  // also sent to the ops desk), so escape everything before it reaches the markup.
+  const data: PaymentReceiptEmailData = {
+    ...rawData,
+    customerName: rawData.customerName ? escapeHtml(rawData.customerName) : undefined,
+    rentalTitle: escapeHtml(rawData.rentalTitle),
+    rentalType: rawData.rentalType ? escapeHtml(rawData.rentalType) : undefined,
+    startDate: escapeHtml(rawData.startDate),
+    endDate: escapeHtml(rawData.endDate),
+    driveOption: rawData.driveOption ? escapeHtml(rawData.driveOption) : undefined,
+    currency: escapeHtml(rawData.currency),
+    transactionId: escapeHtml(rawData.transactionId),
+    bookingId: escapeHtml(rawData.bookingId),
+    paymentMethod: rawData.paymentMethod ? escapeHtml(rawData.paymentMethod) : undefined,
+    paymentDate: rawData.paymentDate ? escapeHtml(rawData.paymentDate) : undefined,
+  };
   const greeting = data.customerName ? `Dear ${data.customerName},` : "Hello,";
   const numAmount = typeof data.amount === "number" ? data.amount : parseFloat(String(data.amount)) || 0;
   const formattedAmount = numAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });

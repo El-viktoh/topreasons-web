@@ -1,26 +1,31 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { generatePaymentReceiptEmailHtml, EMAIL_CONFIG, sendEmail } from '@/lib/email';
+import { timingSafeEqual } from 'crypto';
+import {
+  fetchVerifiedTransaction,
+  getBookingForPayment,
+  checkTransactionMatchesBooking,
+  confirmBookingPayment,
+} from '@/lib/payments';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SECRET_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const safeEqual = (a: string, b: string) => {
+  const left = Buffer.from(a);
+  const right = Buffer.from(b);
+  return left.length === right.length && timingSafeEqual(left, right);
+};
 
 export async function POST(req: Request) {
   try {
-    const signature = req.headers.get('verif-hash');
     const secretHash = process.env.FLUTTERWAVE_SECRET_HASH;
 
     // Fail closed: without a configured secret there is no way to tell a real
-    // Flutterwave call from a forged one, so refuse the request rather than
-    // silently accepting it.
+    // Flutterwave call from a forged one, so refuse the request.
     if (!secretHash) {
       console.error('Webhook rejected: FLUTTERWAVE_SECRET_HASH is not configured.');
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
     }
 
-    if (signature !== secretHash) {
+    const signature = req.headers.get('verif-hash') ?? '';
+    if (!safeEqual(signature, secretHash)) {
       console.warn('Webhook verification failed: invalid verif-hash signature.');
       return NextResponse.json({ error: 'Unauthorized webhook call' }, { status: 401 });
     }
@@ -28,94 +33,39 @@ export async function POST(req: Request) {
     const payload = await req.json();
     const { event, data } = payload;
 
-    if (event === 'charge.completed' && data?.status === 'successful') {
-      const transactionId = data.id;
-      const txRef = data.tx_ref;
-      const amount = data.amount;
-      const currency = data.currency;
-
-      // Extract booking ID from tx_ref (format: booking-<uuid>-<timestamp>).
-      // The booking UUID itself contains hyphens, so this can't be a simple
-      // split on "-" — match everything between the "booking-" prefix and the
-      // trailing numeric timestamp instead.
-      let bookingId: string | null = null;
-      if (txRef && typeof txRef === 'string') {
-        const match = txRef.match(/^booking-(.+)-\d+$/);
-        if (match) {
-          bookingId = match[1];
-        }
-      }
-
-      if (!bookingId && data.meta?.booking_id) {
-        bookingId = data.meta.booking_id;
-      }
-
-      if (bookingId) {
-        // Fetch booking record
-        const { data: booking } = await supabase
-          .from('bookings')
-          .select('*, rental:rentals(title, type)')
-          .eq('id', bookingId)
-          .maybeSingle();
-
-        if (booking && booking.payment_status !== 'paid') {
-          // Update status to paid & confirmed
-          await supabase
-            .from('bookings')
-            .update({
-              payment_status: 'paid',
-              status: 'confirmed'
-            })
-            .eq('id', booking.id);
-
-          // Dispatch email receipt
-          const customerEmail = data.customer?.email || booking.guest_email;
-          const customerName = data.customer?.name || booking.guest_name;
-
-          if (customerEmail) {
-            const rentalTitle = booking.rental?.title || 'Luxury Fleet Service';
-            const emailHtml = generatePaymentReceiptEmailHtml({
-              customerName,
-              rentalTitle,
-              rentalType: booking.rental?.type,
-              startDate: booking.start_date,
-              endDate: booking.end_date,
-              driveOption: booking.drive_option,
-              currency: currency || 'GHS',
-              amount,
-              transactionId,
-              bookingId: booking.id,
-              paymentMethod: data.payment_type || 'Card / Mobile Money',
-            });
-
-            // 1. Send receipt to customer
-            await sendEmail({
-              from: EMAIL_CONFIG.from,
-              replyTo: EMAIL_CONFIG.replyTo,
-              to: customerEmail,
-              subject: `Payment Confirmed & Receipt - ${rentalTitle}`,
-              html: emailHtml,
-            });
-
-            // 2. Alert operations desk
-            try {
-              await sendEmail({
-                from: EMAIL_CONFIG.from,
-                replyTo: customerEmail,
-                to: EMAIL_CONFIG.supportEmail,
-                subject: `🚨 [PAID WEBHOOK] ${rentalTitle} - ${currency} ${amount}`,
-                html: emailHtml,
-              });
-            } catch (adminErr) {
-              console.warn('Webhook admin notification failed:', adminErr);
-            }
-          }
-        }
-      }
+    if (event !== 'charge.completed' || data?.status !== 'successful' || !data?.id) {
+      return NextResponse.json({ received: true });
     }
 
+    // Never trust amounts or references in the webhook body: re-verify with Flutterwave.
+    const tx = await fetchVerifiedTransaction(data.id);
+    if (!tx) {
+      console.warn('Webhook ignored: transaction could not be verified', { id: data.id });
+      return NextResponse.json({ received: true });
+    }
+
+    // Reference format is booking-<booking uuid>-<timestamp>
+    const match = tx.txRef.match(/^booking-([0-9a-f-]{36})-\d+$/i);
+    if (!match) {
+      console.warn('Webhook ignored: unrecognised payment reference', { txRef: tx.txRef });
+      return NextResponse.json({ received: true });
+    }
+
+    const booking = await getBookingForPayment(match[1]);
+    if (!booking) {
+      console.warn('Webhook ignored: booking not found', { bookingId: match[1] });
+      return NextResponse.json({ received: true });
+    }
+
+    const check = checkTransactionMatchesBooking(booking, tx);
+    if (!check.ok) {
+      console.warn('Webhook ignored:', check.reason, { bookingId: booking.id, txRef: tx.txRef });
+      return NextResponse.json({ received: true });
+    }
+
+    await confirmBookingPayment(booking, tx);
     return NextResponse.json({ received: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Flutterwave webhook processing error:', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
