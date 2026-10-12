@@ -114,7 +114,12 @@ function ConfirmContent() {
       setResendSent(true);
       toast.success("Verification link sent! Check your inbox.");
     } catch (err: any) {
-      toast.error(err.message || "Failed to resend verification email");
+      const msg = err?.message;
+      toast.error(
+        !msg || msg === "{}" || msg.trim() === "{}"
+          ? "Failed to resend verification email. Please try again later."
+          : msg
+      );
     } finally {
       setResendLoading(false);
     }

@@ -33,6 +33,8 @@ export default function Auth() {
   const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
   const [passwordChecks, setPasswordChecks] = useState({
     length: false,
@@ -97,6 +99,18 @@ export default function Auth() {
     });
   };
 
+  const getAuthErrorMessage = (error: any, fallback: string): string => {
+    if (!error) return fallback;
+    const msg = typeof error === "string" ? error : error?.message;
+    if (!msg || msg === "{}" || msg.trim() === "{}") {
+      if (error?.status === 500) {
+        return "The server encountered an issue sending verification emails. Please try again shortly.";
+      }
+      return fallback;
+    }
+    return msg;
+  };
+
   const handleForgotPassword = async () => {
     const result = resetEmailSchema.safeParse({ email: resetEmail });
     if (!result.success) {
@@ -113,7 +127,7 @@ export default function Auth() {
       setForgotPasswordOpen(false);
       setResetEmail("");
     } catch (error: any) {
-      toast.error(error.message || "Failed to send reset email");
+      toast.error(getAuthErrorMessage(error, "Failed to send reset email"));
     } finally {
       setResetLoading(false);
     }
@@ -132,7 +146,7 @@ export default function Auth() {
       if (error) throw error;
       setPasswordUpdatedOpen(true);
     } catch (error: any) {
-      toast.error(error.message || "Failed to update password");
+      toast.error(getAuthErrorMessage(error, "Failed to update password"));
     } finally {
       setIsLoading(false);
     }
@@ -150,14 +164,82 @@ export default function Auth() {
         },
       });
       if (error) throw error;
-      toast.success("Fresh verification link sent! Check your inbox.");
+      toast.success("Fresh verification email sent! Check your inbox.");
       setResendCooldown(60);
+      // A new email replaces the old link and code, so clear any half-typed code
+      setVerificationCode("");
     } catch (error: any) {
-      toast.error(error.message || "Failed to resend verification email");
+      toast.error(getAuthErrorMessage(error, "Failed to resend verification email"));
     } finally {
       setIsResending(false);
     }
   };
+
+  const handleVerifyCode = async (targetEmail: string) => {
+    const token = verificationCode.trim();
+    if (!/^\d{6}$/.test(token)) {
+      toast.error("Enter the 6-digit code from your email.");
+      return;
+    }
+    setIsVerifyingCode(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: targetEmail,
+        token,
+        type: "signup",
+      });
+      if (error) throw error;
+      toast.success("Email verified! You're signed in.");
+      setVerificationCode("");
+      setPendingVerificationEmail(null);
+      setUnconfirmedEmail(null);
+      router.push("/");
+    } catch (error) {
+      const msg = getAuthErrorMessage(error, "Could not verify the code. Please try again.");
+      toast.error(
+        /expired|invalid/i.test(msg)
+          ? "That code is incorrect or has expired. Use the code from the newest email, or request a new one."
+          : msg
+      );
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  // A plain render function (not a component) so the input keeps focus while typing
+  const renderCodeEntry = (targetEmail: string) => (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleVerifyCode(targetEmail);
+      }}
+      className="space-y-2 text-left"
+    >
+      <Label htmlFor="verification-code" className="text-xs uppercase tracking-wider text-muted-foreground">
+        Or enter the 6-digit code from the email
+      </Label>
+      <Input
+        id="verification-code"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        maxLength={6}
+        placeholder="123456"
+        value={verificationCode}
+        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+        className="text-center text-lg font-mono tracking-[0.5em]"
+      />
+      <Button type="submit" className="w-full" disabled={isVerifyingCode || verificationCode.length !== 6}>
+        {isVerifyingCode ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Verifying...
+          </>
+        ) : (
+          "Verify Code"
+        )}
+      </Button>
+    </form>
+  );
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,7 +275,7 @@ export default function Auth() {
       toast.success("Signed in successfully!");
       router.push("/");
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign in");
+      toast.error(getAuthErrorMessage(error, "Failed to sign in"));
     } finally {
       setIsLoading(false);
     }
@@ -250,7 +332,7 @@ export default function Auth() {
         toast.success("Account created! Verification email sent.");
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign up");
+      toast.error(getAuthErrorMessage(error, "Failed to sign up. The email confirmation service may be temporarily unavailable."));
     } finally {
       setIsLoading(false);
     }
@@ -336,8 +418,10 @@ export default function Auth() {
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Click the confirmation link inside the email to activate your account. If you don't see it within a couple of minutes, please check your spam or junk folder.
+                Click the confirmation link inside the email, or type the 6-digit code from it below, to activate your account. If you don't see the email within a couple of minutes, please check your spam or junk folder.
               </p>
+
+              {renderCodeEntry(pendingVerificationEmail)}
 
               <div className="pt-2">
                 <Button
@@ -407,10 +491,11 @@ export default function Auth() {
                         <div>
                           <strong>Email Verification Required</strong>
                           <p className="text-muted-foreground mt-0.5">
-                            Your account is not verified yet. Check your inbox for the link from enquiries@topreasonsco.com.
+                            Your account is not verified yet. Check your inbox for the link or 6-digit code from enquiries@topreasonsco.com.
                           </p>
                         </div>
                       </div>
+                      {renderCodeEntry(unconfirmedEmail)}
                       <Button
                         type="button"
                         variant="secondary"
