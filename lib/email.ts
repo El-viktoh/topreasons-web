@@ -41,7 +41,9 @@ export async function sendEmail({
   }
 
   try {
-    const data = await resend.emails.send({
+    // The Resend SDK reports API rejections (unverified domain, bad key, invalid address...)
+    // in `error` instead of throwing, so it has to be checked or failures look like successes.
+    const { data, error } = await resend.emails.send({
       from,
       to: Array.isArray(to) ? to : [to],
       replyTo,
@@ -49,6 +51,10 @@ export async function sendEmail({
       html,
       text,
     });
+    if (error) {
+      console.error("Resend rejected the email:", error);
+      return { success: false, error: error.message || "Resend rejected the email" };
+    }
     return { success: true, data };
   } catch (error: any) {
     console.error("Failed to send email via Resend:", error);
@@ -304,6 +310,43 @@ const escapeHtml = (value: unknown): string =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+
+/**
+ * HTML for the notification the ops desk receives when someone uses the website contact form.
+ * Everything the visitor typed is escaped; line breaks in the message are kept.
+ */
+export function generateContactNotificationEmailHtml(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const name = escapeHtml(data.name);
+  const email = escapeHtml(data.email);
+  const subject = escapeHtml(data.subject);
+  const message = escapeHtml(data.message).replace(/\n/g, "<br />");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>New website message</title></head>
+<body style="margin: 0; padding: 24px; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 10px; overflow: hidden;">
+    <tr><td style="background-color: #0b0f17; padding: 18px 24px; border-bottom: 3px solid #d4af37;">
+      <span style="color: #d4af37; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Top Reasons &middot; Website contact form</span>
+    </td></tr>
+    <tr><td style="padding: 24px;">
+      <h2 style="margin: 0 0 16px 0; font-size: 18px;">${subject}</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px; margin-bottom: 18px;">
+        <tr><td style="padding: 4px 0; color: #71717a; width: 80px;">From</td><td style="padding: 4px 0; font-weight: 600;">${name}</td></tr>
+        <tr><td style="padding: 4px 0; color: #71717a;">Email</td><td style="padding: 4px 0;"><a href="mailto:${email}" style="color: #996515;">${email}</a></td></tr>
+      </table>
+      <div style="padding: 16px; background-color: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px; line-height: 22px;">${message}</div>
+      <p style="margin: 18px 0 0 0; font-size: 12px; color: #71717a;">Press Reply to answer ${name} directly. Replies go to ${email}.</p>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
 
 export interface BookingReceivedEmailData {
   customerName?: string;

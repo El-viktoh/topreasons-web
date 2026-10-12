@@ -27,15 +27,29 @@ const faqs = [
 
 export default function Contact() {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  // `website` is a hidden trap field: real visitors never see or fill it, bots usually do
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "", website: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.success("Message sent! We'll get back to you as soon as possible.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setLoading(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "We couldn't send your message. Please try again.");
+      }
+      toast.success("Message sent! We'll get back to you as soon as possible.");
+      setFormData({ name: "", email: "", subject: "", message: "", website: "" });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "We couldn't send your message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,6 +104,18 @@ export default function Contact() {
                 Fill out the form below and we'll get back to you within 24 hours.
               </p>
               <form onSubmit={handleSubmit} className="space-y-5">
+                <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                  <label htmlFor="website">Leave this field empty</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  />
+                </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-xs uppercase tracking-widest">Name</Label>
