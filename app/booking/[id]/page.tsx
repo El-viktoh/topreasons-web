@@ -70,7 +70,9 @@ export default function Booking() {
     customizations: {
       title: "TopReasons Booking",
       description: `Payment for ${rental?.title || "Rental"}`,
-      logo: "https://topreasons-web.vercel.app/assets/logo.png",
+      // Square, dark-background version of the logo: the normal logo is white on transparent,
+      // which disappears on Flutterwave's white window. Uses the main domain (no redirect).
+      logo: "https://topreasonsco.com/assets/logo-checkout.png",
     },
   });
 
