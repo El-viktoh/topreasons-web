@@ -348,6 +348,55 @@ export function generateContactNotificationEmailHtml(data: {
 </html>`;
 }
 
+/**
+ * HTML for the notification the ops desk receives when someone submits the driver application.
+ * Every value the applicant typed is escaped; line breaks in the experience text are kept.
+ */
+export function generateDriverApplicationEmailHtml(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  vehicleType: string;
+  vehicleMake: string;
+  vehicleYear: string;
+  licenseNumber: string;
+  experience: string;
+}) {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding: 6px 0; color: #71717a; width: 150px; vertical-align: top;">${label}</td><td style="padding: 6px 0; font-weight: 600;">${value}</td></tr>`;
+  const email = escapeHtml(data.email);
+  const phone = escapeHtml(data.phone);
+  const fullName = `${escapeHtml(data.firstName)} ${escapeHtml(data.lastName)}`;
+  const experience = escapeHtml(data.experience).replace(/\n/g, "<br />");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>New driver application</title></head>
+<body style="margin: 0; padding: 24px; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 10px; overflow: hidden;">
+    <tr><td style="background-color: #0b0f17; padding: 18px 24px; border-bottom: 3px solid #d4af37;">
+      <span style="color: #d4af37; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Top Reasons &middot; New driver application</span>
+    </td></tr>
+    <tr><td style="padding: 24px;">
+      <h2 style="margin: 0 0 18px 0; font-size: 20px;">${fullName}</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px; margin-bottom: 18px;">
+        ${row("Email", `<a href="mailto:${email}" style="color: #996515;">${email}</a>`)}
+        ${row("Phone", `<a href="tel:${phone.replace(/[^+\d]/g, "")}" style="color: #996515;">${phone}</a>`)}
+        ${row("Vehicle type", escapeHtml(data.vehicleType))}
+        ${row("Make &amp; model", escapeHtml(data.vehicleMake))}
+        ${row("Year", escapeHtml(data.vehicleYear))}
+        ${row("License number", escapeHtml(data.licenseNumber))}
+      </table>
+      <p style="margin: 0 0 8px 0; font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 1px;">Driving experience</p>
+      <div style="padding: 16px; background-color: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px; line-height: 22px;">${experience}</div>
+      <p style="margin: 18px 0 0 0; font-size: 12px; color: #71717a;">Press Reply to contact ${fullName} directly. Replies go to ${email}.</p>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 export interface BookingReceivedEmailData {
   customerName?: string;
   rentalTitle: string;

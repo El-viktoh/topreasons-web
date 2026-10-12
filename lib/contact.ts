@@ -17,10 +17,10 @@ export type ContactValidation =
   | { ok: true; value: ContactMessage }
   | { ok: false; error: string };
 
-const EMAIL_PATTERN = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]+$/;
+export const EMAIL_PATTERN = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]+$/;
 
 // One line only: names and subjects end up in email headers and subject lines.
-const singleLine = (value: unknown) =>
+export const singleLine = (value: unknown) =>
   typeof value === "string" ? value.replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim() : "";
 
 export function validateContactMessage(input: unknown): ContactValidation {
