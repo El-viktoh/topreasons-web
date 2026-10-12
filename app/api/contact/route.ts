@@ -3,8 +3,12 @@ import { validateContactMessage } from '@/lib/contact';
 import { generateContactNotificationEmailHtml, EMAIL_CONFIG, sendEmail } from '@/lib/email';
 import { createRateLimiter } from '@/lib/rate-limit';
 
-// 5 messages per IP every 10 minutes is plenty for a real person.
-const perIp = createRateLimiter(5, 10 * 60_000);
+// Typos and validation errors must never block a real visitor, so only messages that pass
+// validation count toward the "sent" limits. Many mobile users share one IP address, so the
+// per-IP limits are generous; the real brake on repeats is per sender email.
+const attemptsPerIp = createRateLimiter(60, 60 * 60_000);
+const messagesPerIp = createRateLimiter(15, 60 * 60_000);
+const messagesPerEmail = createRateLimiter(5, 24 * 60 * 60_000);
 
 // Emails the website contact form to the ops desk. The recipient is always the fixed support
 // address, so this can't be used to email anyone else. The visitor's address is only set as
@@ -12,9 +16,9 @@ const perIp = createRateLimiter(5, 10 * 60_000);
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
-    if (!perIp(ip)) {
+    if (!attemptsPerIp(ip)) {
       return NextResponse.json(
-        { error: 'You have sent several messages recently. Please try again in a few minutes.' },
+        { error: 'Too many requests from your connection. Please try again in a little while.' },
         { status: 429 }
       );
     }
@@ -32,6 +36,13 @@ export async function POST(req: Request) {
     }
     const { name, email, subject, message } = result.value;
 
+    if (!messagesPerEmail(email) || !messagesPerIp(ip)) {
+      return NextResponse.json(
+        { error: `You have sent several messages recently. Please wait a while, or email us directly at ${EMAIL_CONFIG.supportEmail}.` },
+        { status: 429 }
+      );
+    }
+
     const sent = await sendEmail({
       from: EMAIL_CONFIG.from,
       replyTo: email,
@@ -41,6 +52,9 @@ export async function POST(req: Request) {
     });
 
     if (!sent.success) {
+      // Our side failed, so don't count this against the visitor's allowance
+      messagesPerEmail.refund(email);
+      messagesPerIp.refund(ip);
       console.error('Contact form email failed:', sent.error);
       return NextResponse.json(
         { error: `We couldn't send your message right now. Please email us directly at ${EMAIL_CONFIG.supportEmail}.` },

@@ -3,8 +3,12 @@ import { validateDriverApplication, VEHICLE_TYPES } from '@/lib/driver-applicati
 import { generateDriverApplicationEmailHtml, EMAIL_CONFIG, sendEmail } from '@/lib/email';
 import { createRateLimiter } from '@/lib/rate-limit';
 
-// An honest applicant sends one. 3 per IP per hour leaves room for typos and retries.
-const perIp = createRateLimiter(3, 60 * 60_000);
+// Typos and validation errors must never lock a real applicant out, so only submissions that
+// pass validation count toward the "sent" limits. Many mobile users share one IP address, so
+// the per-IP limits are generous; the real brake on repeats is per applicant email.
+const attemptsPerIp = createRateLimiter(60, 60 * 60_000);
+const applicationsPerIp = createRateLimiter(20, 60 * 60_000);
+const applicationsPerEmail = createRateLimiter(3, 24 * 60 * 60_000);
 
 // Emails a driver application to the ops desk. Open to anyone (no account needed), but the
 // recipient is always the fixed support address, the applicant's address is only set as
@@ -12,9 +16,9 @@ const perIp = createRateLimiter(3, 60 * 60_000);
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
-    if (!perIp(ip)) {
+    if (!attemptsPerIp(ip)) {
       return NextResponse.json(
-        { error: 'You have submitted several applications recently. Please try again later.' },
+        { error: 'Too many requests from your connection. Please try again in a little while.' },
         { status: 429 }
       );
     }
@@ -32,6 +36,13 @@ export async function POST(req: Request) {
     }
     const application = result.value;
 
+    if (!applicationsPerEmail(application.email) || !applicationsPerIp(ip)) {
+      return NextResponse.json(
+        { error: `We have already received applications from you recently. Please wait before sending another, or email us directly at ${EMAIL_CONFIG.supportEmail}.` },
+        { status: 429 }
+      );
+    }
+
     const sent = await sendEmail({
       from: EMAIL_CONFIG.from,
       replyTo: application.email,
@@ -44,6 +55,9 @@ export async function POST(req: Request) {
     });
 
     if (!sent.success) {
+      // Our side failed, so don't count this against the applicant's allowance
+      applicationsPerEmail.refund(application.email);
+      applicationsPerIp.refund(ip);
       console.error('Driver application email failed:', sent.error);
       return NextResponse.json(
         { error: `We couldn't submit your application right now. Please email us directly at ${EMAIL_CONFIG.supportEmail}.` },
