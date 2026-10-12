@@ -163,16 +163,14 @@ export default function Booking() {
       // 23505 = this visit already created the booking (e.g. a retry); carry on to payment
       if (error && error.code !== "23505") throw error;
 
-      await supabase.functions.invoke("send-booking-confirmation", {
-        body: {
-          email: user ? user.email : guestEmail,
-          rentalTitle: rental.title,
-          startDate: format(dateRange.from, "PPP"),
-          endDate: format(dateRange.to, "PPP"),
-          totalPrice: calculateTotal(),
-          driveOption: isCar ? driveOption : undefined,
-        },
-      });
+      // Fire and forget: the server looks the booking up itself and emails the address stored
+      // on it, so only the booking id is sent and a failure never blocks payment.
+      fetch("/api/bookings/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking_id: bookingId }),
+        keepalive: true,
+      }).catch(() => {});
 
       toast.success("Booking created! Initializing payment...");
 

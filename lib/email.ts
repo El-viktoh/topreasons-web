@@ -305,6 +305,116 @@ const escapeHtml = (value: unknown): string =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
+export interface BookingReceivedEmailData {
+  customerName?: string;
+  rentalTitle: string;
+  startDate: string;
+  endDate: string;
+  driveOption?: string;
+  currency: string;
+  amount: number;
+  bookingId: string;
+}
+
+/**
+ * HTML for the "Booking Received" email sent right after a booking is created, before payment.
+ */
+export function generateBookingReceivedEmailHtml(rawData: BookingReceivedEmailData) {
+  const greeting = rawData.customerName ? `Dear ${escapeHtml(rawData.customerName)},` : "Hello,";
+  const title = escapeHtml(rawData.rentalTitle);
+  const currency = escapeHtml(rawData.currency);
+  const amount = (Number.isFinite(rawData.amount) ? rawData.amount : 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const refCode = `TR-${escapeHtml(String(rawData.bookingId).slice(0, 8).toUpperCase())}`;
+  const driveMode =
+    rawData.driveOption === "self"
+      ? "Self Drive"
+      : rawData.driveOption === "chauffeur"
+        ? "With Professional Chauffeur"
+        : rawData.driveOption
+          ? escapeHtml(rawData.driveOption)
+          : "";
+  const row = (label: string, value: string) => `
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #94a3b8; width: 40%;">${label}</td>
+                  <td align="right" style="padding: 8px 0; font-size: 13px; color: #f1f5f9; font-weight: 600;">${value}</td>
+                </tr>`;
+
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Booking Received - Top Reasons</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #06080d; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #06080d;">
+    <tr>
+      <td align="center" style="padding: 40px 16px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #0f141f; border-radius: 14px; overflow: hidden; border: 1px solid #232d3f;">
+          <tr>
+            <td height="4" style="background: linear-gradient(90deg, #996515 0%, #d4af37 50%, #f6e27a 100%); line-height: 4px; font-size: 4px;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 32px 36px 20px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17;">
+              <a href="${EMAIL_CONFIG.siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="150" style="display: block; max-width: 150px; height: auto; margin-bottom: 8px;" />
+              </a>
+              <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25);">Booking Received</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 36px 40px 12px 40px;" align="center">
+              <h1 style="margin: 0 0 12px 0; font-size: 26px; line-height: 32px; color: #ffffff; font-weight: 800;">We've received your booking</h1>
+              <p style="margin: 0 0 6px 0; font-size: 15px; color: #cbd5e1;">${greeting}</p>
+              <p style="margin: 0; font-size: 14px; line-height: 22px; color: #94a3b8;">Thank you for choosing Top Reasons. Your booking is saved and will be confirmed as soon as payment is completed.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 40px 8px 40px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #0b0f17; border: 1px solid #1a2232; border-radius: 10px;">
+                <tr>
+                  <td style="padding: 16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      ${row("Reference", refCode)}
+                      ${row("Vehicle / Service", title)}
+                      ${row("Start Date", escapeHtml(rawData.startDate))}
+                      ${row("End Date", escapeHtml(rawData.endDate))}
+                      ${driveMode ? row("Drive Mode", driveMode) : ""}
+                      ${row("Total to Pay", `<span style="color: #d4af37;">${currency} ${amount}</span>`)}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 16px 40px 8px 40px;" align="center">
+              <p style="margin: 0; font-size: 13px; line-height: 20px; color: #94a3b8;">If you have just paid, your payment receipt will follow in a separate email within a few minutes. If you closed the payment window, you can finish paying from your bookings page.</p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 20px 40px 32px 40px;">
+              <a href="${EMAIL_CONFIG.siteUrl}/my-bookings" target="_blank" style="display: inline-block; background-color: #d4af37; color: #0b0f17; text-decoration: none; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; padding: 14px 32px; border-radius: 8px; text-transform: uppercase;">View My Bookings</a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 22px 36px; border-top: 1px solid #1a2232; background-color: #0b0f17;">
+              <p style="margin: 0 0 4px 0; font-size: 12px; color: #94a3b8;">Questions? <a href="mailto:${EMAIL_CONFIG.supportEmail}" style="color: #d4af37; text-decoration: none;">${EMAIL_CONFIG.supportEmail}</a> &middot; ${EMAIL_CONFIG.supportPhone}</p>
+              <p style="margin: 0; font-size: 11px; color: #64748b;">${EMAIL_CONFIG.companyName} &middot; ${EMAIL_CONFIG.companyLocation}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 export interface PaymentReceiptEmailData {
   customerName?: string;
   rentalTitle: string;

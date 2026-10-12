@@ -18,8 +18,6 @@ smtp_sender_name = "Top Reasons"
 subject = "Confirm your Top Reasons account"
 content_path = "./templates/confirm_signup.html"
 
-[functions.send-booking-confirmation]
-verify_jwt = false
 
 [functions.send-renter-notification]
 verify_jwt = true

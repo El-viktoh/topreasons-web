@@ -27,6 +27,7 @@ export interface BookingForPayment {
   start_date: string;
   end_date: string;
   payment_status: string | null;
+  created_at?: string | null;
   user_id: string | null;
   guest_email: string | null;
   guest_name: string | null;
@@ -126,20 +127,57 @@ export async function confirmBookingPayment(
   return { confirmed: true };
 }
 
+export interface CustomerContact {
+  email?: string;
+  name?: string;
+}
+
+// Works out who to email for a booking: the guest details stored on it, or for a signed-in
+// customer their profile / account email. Always read from the database, never from the caller.
+export async function resolveCustomerContact(
+  booking: BookingForPayment,
+  fallback: CustomerContact = {}
+): Promise<CustomerContact> {
+  let email = fallback.email || booking.guest_email || undefined;
+  let name = fallback.name || booking.guest_name || undefined;
+
+  if ((!email || !name) && booking.user_id) {
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", booking.user_id)
+      .maybeSingle();
+    if (!email && profile?.email) email = profile.email;
+    if (!name && profile?.full_name) name = profile.full_name;
+
+    if (!email) {
+      const { data } = await supabaseAdmin.auth.admin.getUserById(booking.user_id);
+      email = data?.user?.email || undefined;
+    }
+  }
+
+  return { email, name };
+}
+
+// "Booking received" emails only make sense right after a booking is made and before it is
+// paid, so older or already-paid bookings are never eligible. This also limits how long a
+// booking id could be used to trigger an email.
+export const BOOKING_NOTICE_WINDOW_MS = 30 * 60 * 1000;
+
+export function isEligibleForBookingNotice(booking: BookingForPayment, now: number = Date.now()): boolean {
+  if (booking.payment_status === "paid") return false;
+  const created = Date.parse(String(booking.created_at ?? ""));
+  if (!Number.isFinite(created)) return false;
+  const age = now - created;
+  return age >= -60_000 && age <= BOOKING_NOTICE_WINDOW_MS;
+}
+
 async function sendReceiptEmails(booking: BookingForPayment, tx: VerifiedTransaction) {
   try {
-    let customerEmail = tx.customerEmail || booking.guest_email || undefined;
-    let customerName = tx.customerName || booking.guest_name || undefined;
-
-    if ((!customerEmail || !customerName) && booking.user_id) {
-      const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("email, full_name")
-        .eq("id", booking.user_id)
-        .maybeSingle();
-      if (!customerEmail && profile?.email) customerEmail = profile.email;
-      if (!customerName && profile?.full_name) customerName = profile.full_name;
-    }
+    const { email: customerEmail, name: customerName } = await resolveCustomerContact(booking, {
+      email: tx.customerEmail,
+      name: tx.customerName,
+    });
 
     if (!customerEmail) {
       console.warn("Receipt not sent: no customer email for booking", booking.id);
