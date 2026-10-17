@@ -103,8 +103,8 @@ function ConfirmContent() {
       return;
     }
     const token = manualCode.trim();
-    if (!/^\d{6,8}$/.test(token)) {
-      toast.error("Please enter a valid 6 to 8-digit verification code");
+    if (!/^\d{6}$/.test(token)) {
+      toast.error("Please enter a valid 6-digit verification code");
       return;
     }
     setManualLoading(true);
@@ -274,7 +274,7 @@ function ConfirmContent() {
               {errorMode === "code" ? (
                 <form onSubmit={handleVerifyManualCode} className="space-y-3">
                   <div className="p-3 bg-secondary/40 rounded-md border border-border text-xs text-muted-foreground">
-                    Enter your email address and the 6 to 8-digit verification code from your email.
+                    Enter your email address and the 6-digit verification code from your email.
                   </div>
                   <div className="space-y-1.5 text-left">
                     <Label htmlFor="manual-email" className="text-xs uppercase tracking-wider">
@@ -291,24 +291,24 @@ function ConfirmContent() {
                   </div>
                   <div className="space-y-1.5 text-left">
                     <Label htmlFor="manual-code" className="text-xs uppercase tracking-wider">
-                      Verification Code (6-8 digits)
+                      Verification Code (6 digits)
                     </Label>
                     <Input
                       id="manual-code"
                       inputMode="numeric"
                       autoComplete="one-time-code"
-                      maxLength={8}
-                      placeholder="12345678"
+                      maxLength={6}
+                      placeholder="123456"
                       value={manualCode}
-                      onChange={(e) => setManualCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                      className="text-center font-mono tracking-[0.25em]"
+                      onChange={(e) => setManualCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      className="text-center font-mono tracking-[0.5em]"
                       required
                     />
                   </div>
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={manualLoading || manualCode.length < 6 || manualCode.length > 8}
+                    disabled={manualLoading || manualCode.length !== 6}
                   >
                     {manualLoading ? (
                       <>

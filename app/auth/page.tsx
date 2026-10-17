@@ -139,8 +139,8 @@ export default function Auth() {
   const handleVerifyResetCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = resetCode.trim();
-    if (!/^\d{6,8}$/.test(token)) {
-      toast.error("Enter the 6 to 8-digit verification code from your email.");
+    if (!/^\d{6}$/.test(token)) {
+      toast.error("Enter the 6-digit verification code from your email.");
       return;
     }
     const result = newPasswordSchema.safeParse({ password: resetNewPassword });
@@ -214,8 +214,8 @@ export default function Auth() {
 
   const handleVerifyCode = async (targetEmail: string) => {
     const token = verificationCode.trim();
-    if (!/^\d{6,8}$/.test(token)) {
-      toast.error("Enter the verification code from your email (6 to 8 digits).");
+    if (!/^\d{6}$/.test(token)) {
+      toast.error("Enter the 6-digit verification code from your email.");
       return;
     }
     setIsVerifyingCode(true);
@@ -253,22 +253,22 @@ export default function Auth() {
       className="space-y-2 text-left"
     >
       <Label htmlFor="verification-code" className="text-xs uppercase tracking-wider text-muted-foreground">
-        Or enter the verification code from the email
+        Or enter the 6-digit code from the email
       </Label>
       <Input
         id="verification-code"
         inputMode="numeric"
         autoComplete="one-time-code"
-        maxLength={8}
-        placeholder="12345678"
+        maxLength={6}
+        placeholder="123456"
         value={verificationCode}
-        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
-        className="text-center text-lg font-mono tracking-[0.25em] md:tracking-[0.35em]"
+        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+        className="text-center text-lg font-mono tracking-[0.5em]"
       />
       <Button
         type="submit"
         className="w-full"
-        disabled={isVerifyingCode || verificationCode.length < 6 || verificationCode.length > 8}
+        disabled={isVerifyingCode || verificationCode.length !== 6}
       >
         {isVerifyingCode ? (
           <>
@@ -459,7 +459,7 @@ export default function Auth() {
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Click the confirmation link inside the email, or type the verification code from it below, to activate your account. If you don't see the email within a couple of minutes, please check your spam or junk folder.
+                Click the confirmation link inside the email, or type the 6-digit code from it below, to activate your account. If you don't see the email within a couple of minutes, please check your spam or junk folder.
               </p>
 
               {renderCodeEntry(pendingVerificationEmail)}
@@ -532,7 +532,7 @@ export default function Auth() {
                         <div>
                           <strong>Email Verification Required</strong>
                           <p className="text-muted-foreground mt-0.5">
-                            Your account is not verified yet. Check your inbox for the link or verification code from enquiries@topreasonsco.com.
+                            Your account is not verified yet. Check your inbox for the link or 6-digit code from enquiries@topreasonsco.com.
                           </p>
                         </div>
                       </div>
@@ -727,16 +727,16 @@ export default function Auth() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="reset-code">Verification Code (6-8 digits)</Label>
+                  <Label htmlFor="reset-code">Verification Code (6 digits)</Label>
                   <Input
                     id="reset-code"
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    maxLength={8}
-                    placeholder="12345678"
+                    maxLength={6}
+                    placeholder="123456"
                     value={resetCode}
-                    onChange={(e) => setResetCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                    className="text-center font-mono tracking-[0.25em]"
+                    onChange={(e) => setResetCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    className="text-center font-mono tracking-[0.5em]"
                     required
                   />
                 </div>
@@ -758,7 +758,7 @@ export default function Auth() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isVerifyingResetCode || resetCode.length < 6 || resetCode.length > 8}
+                  disabled={isVerifyingResetCode || resetCode.length !== 6}
                 >
                   {isVerifyingResetCode ? (
                     <>

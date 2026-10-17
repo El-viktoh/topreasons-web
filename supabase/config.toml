@@ -11,7 +11,7 @@ additional_redirect_urls = [
 [auth.email]
 enable_signup = true
 enable_confirmations = true
-otp_length = 8
+otp_length = 6
 smtp_admin_email = "enquiries@topreasonsco.com"
 smtp_sender_name = "Top Reasons"
 
