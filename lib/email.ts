@@ -187,7 +187,7 @@ export function generateVerificationEmailHtml({
                       <tr>
                         <td align="center">
                           <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">
-                            Or enter this 6-digit verification code:
+                            Or enter this verification code:
                           </p>
                           <div style="font-size: 30px; font-weight: 800; letter-spacing: 6px; color: #d4af37; font-family: 'Courier New', Courier, monospace; padding: 8px 16px; display: inline-block;">
                             ${token}

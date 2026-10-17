@@ -23,6 +23,10 @@ function ConfirmContent() {
   const [resendEmail, setResendEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSent, setResendSent] = useState(false);
+  const [manualEmail, setManualEmail] = useState("");
+  const [manualCode, setManualCode] = useState("");
+  const [manualLoading, setManualLoading] = useState(false);
+  const [errorMode, setErrorMode] = useState<"code" | "resend">("code");
 
   useEffect(() => {
     const processConfirmation = async () => {
@@ -91,6 +95,38 @@ function ConfirmContent() {
 
     processConfirmation();
   }, [searchParams]);
+
+  const handleVerifyManualCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualEmail) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    const token = manualCode.trim();
+    if (!/^\d{6,8}$/.test(token)) {
+      toast.error("Please enter a valid 6 to 8-digit verification code");
+      return;
+    }
+    setManualLoading(true);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: manualEmail,
+        token,
+        type: "signup",
+      });
+      if (error) throw error;
+      if (data?.user) {
+        setUserEmail(data.user.email || manualEmail);
+        setUserName(data.user.user_metadata?.full_name || "");
+        setStatus("success");
+        toast.success("Email verified successfully!");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to verify code. Please check that it is correct.");
+    } finally {
+      setManualLoading(false);
+    }
+  };
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,40 +246,118 @@ function ConfirmContent() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
-              <div className="p-3 bg-secondary/40 rounded-md border border-border text-xs text-muted-foreground">
-                Verification links expire after 24 hours for security. Enter your email below to receive a new link sent from <span className="text-primary font-medium">enquiries@topreasonsco.com</span>.
+              <div className="grid grid-cols-2 gap-2 p-1 bg-secondary/50 rounded-lg text-xs font-medium">
+                <button
+                  type="button"
+                  onClick={() => setErrorMode("code")}
+                  className={`py-1.5 px-3 rounded-md transition-all ${
+                    errorMode === "code"
+                      ? "bg-background text-foreground shadow-sm font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Enter Code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setErrorMode("resend")}
+                  className={`py-1.5 px-3 rounded-md transition-all ${
+                    errorMode === "resend"
+                      ? "bg-background text-foreground shadow-sm font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Resend Link
+                </button>
               </div>
 
-              {resendSent ? (
-                <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-md text-xs text-green-400 text-center">
-                  A fresh verification link has been sent to your email. Please check your inbox and spam folder.
-                </div>
-              ) : (
-                <form onSubmit={handleResend} className="space-y-3">
+              {errorMode === "code" ? (
+                <form onSubmit={handleVerifyManualCode} className="space-y-3">
+                  <div className="p-3 bg-secondary/40 rounded-md border border-border text-xs text-muted-foreground">
+                    Enter your email address and the 6 to 8-digit verification code from your email.
+                  </div>
                   <div className="space-y-1.5 text-left">
-                    <Label htmlFor="resend-email" className="text-xs uppercase tracking-wider">
+                    <Label htmlFor="manual-email" className="text-xs uppercase tracking-wider">
                       Your Email Address
                     </Label>
                     <Input
-                      id="resend-email"
+                      id="manual-email"
                       type="email"
                       placeholder="you@example.com"
-                      value={resendEmail}
-                      onChange={(e) => setResendEmail(e.target.value)}
+                      value={manualEmail}
+                      onChange={(e) => setManualEmail(e.target.value)}
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={resendLoading}>
-                    {resendLoading ? (
+                  <div className="space-y-1.5 text-left">
+                    <Label htmlFor="manual-code" className="text-xs uppercase tracking-wider">
+                      Verification Code (6-8 digits)
+                    </Label>
+                    <Input
+                      id="manual-code"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={8}
+                      placeholder="12345678"
+                      value={manualCode}
+                      onChange={(e) => setManualCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                      className="text-center font-mono tracking-[0.25em]"
+                      required
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={manualLoading || manualCode.length < 6 || manualCode.length > 8}
+                  >
+                    {manualLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Sending Link...
+                        Verifying...
                       </>
                     ) : (
-                      "Send Fresh Verification Link"
+                      "Verify Code"
                     )}
                   </Button>
                 </form>
+              ) : (
+                <>
+                  <div className="p-3 bg-secondary/40 rounded-md border border-border text-xs text-muted-foreground">
+                    Verification links expire after 24 hours for security. Enter your email below to receive a new link sent from <span className="text-primary font-medium">enquiries@topreasonsco.com</span>.
+                  </div>
+
+                  {resendSent ? (
+                    <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-md text-xs text-green-400 text-center">
+                      A fresh verification link has been sent to your email. Please check your inbox and spam folder.
+                    </div>
+                  ) : (
+                    <form onSubmit={handleResend} className="space-y-3">
+                      <div className="space-y-1.5 text-left">
+                        <Label htmlFor="resend-email" className="text-xs uppercase tracking-wider">
+                          Your Email Address
+                        </Label>
+                        <Input
+                          id="resend-email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={resendEmail}
+                          onChange={(e) => setResendEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full" disabled={resendLoading}>
+                        {resendLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending Link...
+                          </>
+                        ) : (
+                          "Send Fresh Verification Link"
+                        )}
+                      </Button>
+                    </form>
+                  )}
+                </>
               )}
             </CardContent>
             <CardFooter className="flex justify-center border-t border-border pt-4">

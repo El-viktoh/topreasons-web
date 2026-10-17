@@ -22,6 +22,10 @@ export default function Auth() {
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState<"request" | "verify">("request");
+  const [resetCode, setResetCode] = useState("");
+  const [resetNewPassword, setResetNewPassword] = useState("");
+  const [isVerifyingResetCode, setIsVerifyingResetCode] = useState(false);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const [passwordUpdatedOpen, setPasswordUpdatedOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("signin");
@@ -123,13 +127,46 @@ export default function Auth() {
         redirectTo: `${window.location.origin}/auth#type=recovery`,
       });
       if (error) throw error;
-      toast.success("Password reset link sent! Check your email.");
-      setForgotPasswordOpen(false);
-      setResetEmail("");
+      toast.success("Password reset link and code sent! Check your email.");
+      setForgotPasswordStep("verify");
     } catch (error: any) {
       toast.error(getAuthErrorMessage(error, "Failed to send reset email"));
     } finally {
       setResetLoading(false);
+    }
+  };
+
+  const handleVerifyResetCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = resetCode.trim();
+    if (!/^\d{6,8}$/.test(token)) {
+      toast.error("Enter the 6 to 8-digit verification code from your email.");
+      return;
+    }
+    const result = newPasswordSchema.safeParse({ password: resetNewPassword });
+    if (!result.success) {
+      toast.error(result.error.errors[0]?.message || "Invalid password");
+      return;
+    }
+    setIsVerifyingResetCode(true);
+    try {
+      const { error: otpError } = await supabase.auth.verifyOtp({
+        email: resetEmail,
+        token,
+        type: "recovery",
+      });
+      if (otpError) throw otpError;
+      const { error: updateError } = await supabase.auth.updateUser({ password: resetNewPassword });
+      if (updateError) throw updateError;
+      setForgotPasswordOpen(false);
+      setPasswordUpdatedOpen(true);
+      setResetCode("");
+      setResetNewPassword("");
+      setForgotPasswordStep("request");
+    } catch (error: any) {
+      toast.error(getAuthErrorMessage(error, "Could not verify code or update password"));
+    } finally {
+      setIsVerifyingResetCode(false);
     }
   };
 
@@ -177,8 +214,8 @@ export default function Auth() {
 
   const handleVerifyCode = async (targetEmail: string) => {
     const token = verificationCode.trim();
-    if (!/^\d{6}$/.test(token)) {
-      toast.error("Enter the 6-digit code from your email.");
+    if (!/^\d{6,8}$/.test(token)) {
+      toast.error("Enter the verification code from your email (6 to 8 digits).");
       return;
     }
     setIsVerifyingCode(true);
@@ -216,19 +253,23 @@ export default function Auth() {
       className="space-y-2 text-left"
     >
       <Label htmlFor="verification-code" className="text-xs uppercase tracking-wider text-muted-foreground">
-        Or enter the 6-digit code from the email
+        Or enter the verification code from the email
       </Label>
       <Input
         id="verification-code"
         inputMode="numeric"
         autoComplete="one-time-code"
-        maxLength={6}
-        placeholder="123456"
+        maxLength={8}
+        placeholder="12345678"
         value={verificationCode}
-        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-        className="text-center text-lg font-mono tracking-[0.5em]"
+        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+        className="text-center text-lg font-mono tracking-[0.25em] md:tracking-[0.35em]"
       />
-      <Button type="submit" className="w-full" disabled={isVerifyingCode || verificationCode.length !== 6}>
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isVerifyingCode || verificationCode.length < 6 || verificationCode.length > 8}
+      >
         {isVerifyingCode ? (
           <>
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -418,7 +459,7 @@ export default function Auth() {
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Click the confirmation link inside the email, or type the 6-digit code from it below, to activate your account. If you don't see the email within a couple of minutes, please check your spam or junk folder.
+                Click the confirmation link inside the email, or type the verification code from it below, to activate your account. If you don't see the email within a couple of minutes, please check your spam or junk folder.
               </p>
 
               {renderCodeEntry(pendingVerificationEmail)}
@@ -491,7 +532,7 @@ export default function Auth() {
                         <div>
                           <strong>Email Verification Required</strong>
                           <p className="text-muted-foreground mt-0.5">
-                            Your account is not verified yet. Check your inbox for the link or 6-digit code from enquiries@topreasonsco.com.
+                            Your account is not verified yet. Check your inbox for the link or verification code from enquiries@topreasonsco.com.
                           </p>
                         </div>
                       </div>
@@ -619,21 +660,134 @@ export default function Auth() {
           </Tabs>
         )}
 
-        <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+        <Dialog
+          open={forgotPasswordOpen}
+          onOpenChange={(open) => {
+            setForgotPasswordOpen(open);
+            if (!open) {
+              setForgotPasswordStep("request");
+              setResetCode("");
+              setResetNewPassword("");
+            }
+          }}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Reset Password</DialogTitle>
-              <DialogDescription>Enter your email address and we'll send you a link to reset your password.</DialogDescription>
+              <DialogDescription>
+                {forgotPasswordStep === "request"
+                  ? "Enter your email address and we'll send you a link and verification code to reset your password."
+                  : "Enter the verification code sent to your email and your new password."}
+              </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="reset-email">Email Address</Label>
-                <Input id="reset-email" type="email" placeholder="you@example.com" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
+
+            {forgotPasswordStep === "request" ? (
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email">Email Address</Label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                  />
+                </div>
+                <Button onClick={handleForgotPassword} className="w-full" disabled={resetLoading}>
+                  {resetLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Reset Link & Code"
+                  )}
+                </Button>
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setForgotPasswordStep("verify")}
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                  >
+                    Already have a reset code? Enter it here
+                  </button>
+                </div>
               </div>
-              <Button onClick={handleForgotPassword} className="w-full" disabled={resetLoading}>
-                {resetLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sending...</> : "Send Reset Link"}
-              </Button>
-            </div>
+            ) : (
+              <form onSubmit={handleVerifyResetCode} className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="verify-reset-email">Email Address</Label>
+                  <Input
+                    id="verify-reset-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-code">Verification Code (6-8 digits)</Label>
+                  <Input
+                    id="reset-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={8}
+                    placeholder="12345678"
+                    value={resetCode}
+                    onChange={(e) => setResetCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                    className="text-center font-mono tracking-[0.25em]"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-new-password">New Password</Label>
+                  <Input
+                    id="reset-new-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={resetNewPassword}
+                    onChange={(e) => {
+                      setResetNewPassword(e.target.value);
+                      checkPasswordStrength(e.target.value);
+                    }}
+                    required
+                  />
+                  <PasswordRequirements password={resetNewPassword} />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isVerifyingResetCode || resetCode.length < 6 || resetCode.length > 8}
+                >
+                  {isVerifyingResetCode ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Updating Password...
+                    </>
+                  ) : (
+                    "Verify Code & Update Password"
+                  )}
+                </Button>
+                <div className="flex items-center justify-between pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setForgotPasswordStep("request")}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    &larr; Request another code
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={resetLoading}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Resend Code
+                  </button>
+                </div>
+              </form>
+            )}
           </DialogContent>
         </Dialog>
 
