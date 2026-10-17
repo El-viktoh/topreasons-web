@@ -17,11 +17,16 @@ import {
   ArrowLeft,
   Mail,
   CreditCard,
+  CalendarCheck,
   Key,
   Settings,
 } from "lucide-react";
 import { toast } from "sonner";
-import { generateVerificationEmailHtml, generatePaymentReceiptEmailHtml } from "@/lib/email";
+import {
+  generateVerificationEmailHtml,
+  generatePaymentReceiptEmailHtml,
+  generateBookingReceivedEmailHtml,
+} from "@/lib/email";
 import { supabase } from "@/lib/supabase/client";
 
 // Raw Go template for Supabase Auth Confirm Signup
@@ -64,18 +69,18 @@ const SUPABASE_RAW_TEMPLATE = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tran
           </tr>
 
           <tr>
-            <td align="center" class="header-padding" style="padding: 36px 36px 24px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+            <td align="center" class="header-padding" style="padding: 36px 36px 24px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17; text-align: center;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" align="center" style="width: 100%; margin: 0 auto; text-align: center;">
                 <tr>
-                  <td align="center">
+                  <td align="center" style="text-align: center; padding-bottom: 12px;">
                     <a href="{{ .SiteURL }}" target="_blank" style="text-decoration: none; display: inline-block;">
-                      <img src="https://topreasonsco.com/assets/logo.png" alt="Top Reasons" width="160" height="auto" style="display: block; max-width: 160px; height: auto; margin-bottom: 8px;" />
+                      <img src="https://topreasonsco.com/assets/logo.png" alt="Top Reasons" width="160" height="auto" border="0" style="display: block; margin: 0 auto; max-width: 160px; width: 160px; height: auto;" />
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center">
-                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25);">
+                  <td align="center" style="text-align: center;">
+                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25); line-height: 14px; text-align: center;">
                       Premier Fleet &bull; Ghana
                     </span>
                   </td>
@@ -250,11 +255,23 @@ const SUPABASE_RAW_TEMPLATE = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tran
 </html>`;
 
 export default function EmailPreviewPage() {
-  const [activeTemplate, setActiveTemplate] = useState<"verification" | "payment">("payment");
+  const [activeTemplate, setActiveTemplate] = useState<"booking" | "payment" | "verification">("booking");
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop");
   const [copied, setCopied] = useState(false);
   const [testEmail, setTestEmail] = useState("");
   const [isSending, setIsSending] = useState(false);
+
+  // Generate booking received HTML with realistic dummy data
+  const bookingReceivedHtml = generateBookingReceivedEmailHtml({
+    customerName: "Victor yeboah",
+    rentalTitle: "Hyundai Santa Fe",
+    startDate: "2026-10-17",
+    endDate: "2026-10-19",
+    driveOption: "self",
+    currency: "GHS",
+    amount: 3000,
+    bookingId: "581d0e8a-8492-46a2-9218-19e918491c10",
+  });
 
   // Generate payment receipt HTML with realistic dummy data
   const paymentReceiptHtml = generatePaymentReceiptEmailHtml({
@@ -280,10 +297,20 @@ export default function EmailPreviewPage() {
     .replace(/\{\{\s*end\s*\}\}/g, "")
     .replace(/\{\{\s*\.Token\s*\}\}/g, "739214");
 
-  const currentPreviewHtml = activeTemplate === "payment" ? paymentReceiptHtml : verificationPreviewHtml;
+  const currentPreviewHtml =
+    activeTemplate === "booking"
+      ? bookingReceivedHtml
+      : activeTemplate === "payment"
+        ? paymentReceiptHtml
+        : verificationPreviewHtml;
 
   const handleCopy = () => {
-    const content = activeTemplate === "payment" ? paymentReceiptHtml : SUPABASE_RAW_TEMPLATE;
+    const content =
+      activeTemplate === "booking"
+        ? bookingReceivedHtml
+        : activeTemplate === "payment"
+          ? paymentReceiptHtml
+          : SUPABASE_RAW_TEMPLATE;
     navigator.clipboard.writeText(content);
     setCopied(true);
     toast.success("HTML template copied to clipboard!");
@@ -314,7 +341,7 @@ export default function EmailPreviewPage() {
         body: JSON.stringify({
           to: testEmail,
           template: activeTemplate,
-          fullName: activeTemplate === "payment" ? "Kofi Mensah" : "VIP Client",
+          fullName: activeTemplate === "booking" ? "Victor yeboah" : activeTemplate === "payment" ? "Kofi Mensah" : "VIP Client",
         }),
       });
       const data = await res.json();
@@ -349,6 +376,17 @@ export default function EmailPreviewPage() {
 
           {/* Template Selector */}
           <div className="flex items-center bg-secondary/80 p-0.5 rounded-lg border border-border">
+            <button
+              onClick={() => setActiveTemplate("booking")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${
+                activeTemplate === "booking"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <CalendarCheck className="w-3.5 h-3.5" />
+              Booking Received
+            </button>
             <button
               onClick={() => setActiveTemplate("payment")}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${
@@ -420,9 +458,11 @@ export default function EmailPreviewPage() {
             </span>
             <span className="truncate max-w-[280px]">
               Subject:{" "}
-              {activeTemplate === "payment"
-                ? "Payment Confirmed & Receipt - Mercedes-Benz S-Class"
-                : "Confirm Your Top Reasons Account"}
+              {activeTemplate === "booking"
+                ? "We've received your booking - Hyundai Santa Fe"
+                : activeTemplate === "payment"
+                  ? "Payment Confirmed & Receipt - Mercedes-Benz S-Class"
+                  : "Confirm Your Top Reasons Account"}
             </span>
           </div>
 
@@ -455,7 +495,11 @@ export default function EmailPreviewPage() {
               <CardDescription className="text-xs">
                 Send a real test of the{" "}
                 <strong>
-                  {activeTemplate === "payment" ? "Payment Receipt" : "Sign-up Verification"}
+                  {activeTemplate === "booking"
+                    ? "Booking Received"
+                    : activeTemplate === "payment"
+                      ? "Payment Receipt"
+                      : "Sign-up Verification"}
                 </strong>{" "}
                 email to your inbox from <span className="text-primary">enquiries@topreasonsco.com</span>.
               </CardDescription>
@@ -527,7 +571,11 @@ export default function EmailPreviewPage() {
               <Card className="border-border bg-card">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
                   <CardTitle className="text-xs font-mono">
-                    {activeTemplate === "payment" ? "payment_receipt.html" : "confirm_signup.html"}
+                    {activeTemplate === "booking"
+                      ? "booking_received.html"
+                      : activeTemplate === "payment"
+                        ? "payment_receipt.html"
+                        : "confirm_signup.html"}
                   </CardTitle>
                   <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={handleCopy}>
                     {copied ? <Check className="w-3 h-3 text-green-500 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
@@ -536,7 +584,11 @@ export default function EmailPreviewPage() {
                 </CardHeader>
                 <CardContent>
                   <pre className="text-[11px] bg-background p-3 rounded border border-border overflow-x-auto max-h-[350px] font-mono text-muted-foreground">
-                    {activeTemplate === "payment" ? paymentReceiptHtml : SUPABASE_RAW_TEMPLATE}
+                    {activeTemplate === "booking"
+                      ? bookingReceivedHtml
+                      : activeTemplate === "payment"
+                        ? paymentReceiptHtml
+                        : SUPABASE_RAW_TEMPLATE}
                   </pre>
                 </CardContent>
               </Card>

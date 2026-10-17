@@ -4,6 +4,7 @@ import {
   sendEmail,
   generateVerificationEmailHtml,
   generatePaymentReceiptEmailHtml,
+  generateBookingReceivedEmailHtml,
   EMAIL_CONFIG,
 } from "@/lib/email";
 
@@ -69,6 +70,18 @@ export async function POST(req: Request) {
         transactionId: "FLW-TEST-94829104",
         bookingId: "b84e18d2-4e12-46a2-9218-19e918491c10",
         paymentMethod: "Mobile Money (MTN)",
+      });
+    } else if (template === "booking") {
+      subject = "We've received your booking - Hyundai Santa Fe";
+      html = generateBookingReceivedEmailHtml({
+        customerName: fullName,
+        rentalTitle: "Hyundai Santa Fe",
+        startDate: "2026-10-17",
+        endDate: "2026-10-19",
+        driveOption: "self",
+        currency: "GHS",
+        amount: 3000,
+        bookingId: "581d0e8a-8492-46a2-9218-19e918491c10",
       });
     } else {
       return NextResponse.json({ error: "Unknown template" }, { status: 400 });

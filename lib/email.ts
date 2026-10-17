@@ -115,18 +115,18 @@ export function generateVerificationEmailHtml({
           </tr>
 
           <tr>
-            <td align="center" class="header-padding" style="padding: 36px 36px 24px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+            <td align="center" class="header-padding" style="padding: 36px 36px 24px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17; text-align: center;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" align="center" style="width: 100%; margin: 0 auto; text-align: center;">
                 <tr>
-                  <td align="center">
+                  <td align="center" style="text-align: center; padding-bottom: 12px;">
                     <a href="${EMAIL_CONFIG.siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
-                      <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="160" height="auto" style="display: block; max-width: 160px; height: auto; margin-bottom: 8px;" />
+                      <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="160" height="auto" border="0" style="display: block; margin: 0 auto; max-width: 160px; width: 160px; height: auto;" />
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center">
-                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25);">
+                  <td align="center" style="text-align: center;">
+                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25); line-height: 14px; text-align: center;">
                       Premier Fleet &bull; Ghana
                     </span>
                   </td>
@@ -451,11 +451,21 @@ export function generateBookingReceivedEmailHtml(rawData: BookingReceivedEmailDa
             <td height="4" style="background: linear-gradient(90deg, #996515 0%, #d4af37 50%, #f6e27a 100%); line-height: 4px; font-size: 4px;">&nbsp;</td>
           </tr>
           <tr>
-            <td align="center" style="padding: 32px 36px 20px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17;">
-              <a href="${EMAIL_CONFIG.siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
-                <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="150" style="display: block; max-width: 150px; height: auto; margin-bottom: 8px;" />
-              </a>
-              <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25);">Booking Received</span>
+            <td align="center" class="header-padding" style="padding: 32px 36px 24px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17; text-align: center;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" align="center" style="width: 100%; margin: 0 auto; text-align: center;">
+                <tr>
+                  <td align="center" style="text-align: center; padding-bottom: 12px;">
+                    <a href="${EMAIL_CONFIG.siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                      <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="150" height="auto" border="0" style="display: block; margin: 0 auto; max-width: 150px; width: 150px; height: auto;" />
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="text-align: center;">
+                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25); line-height: 14px; text-align: center;">Booking Received</span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
@@ -591,18 +601,18 @@ export function generatePaymentReceiptEmailHtml(rawData: PaymentReceiptEmailData
 
           <!-- Header Section -->
           <tr>
-            <td align="center" class="header-padding" style="padding: 32px 36px 20px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+            <td align="center" class="header-padding" style="padding: 32px 36px 24px 36px; border-bottom: 1px solid #1a2232; background-color: #0b0f17; text-align: center;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" align="center" style="width: 100%; margin: 0 auto; text-align: center;">
                 <tr>
-                  <td align="center">
+                  <td align="center" style="text-align: center; padding-bottom: 12px;">
                     <a href="${EMAIL_CONFIG.siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
-                      <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="150" height="auto" style="display: block; max-width: 150px; height: auto; margin-bottom: 8px;" />
+                      <img src="${EMAIL_CONFIG.logoUrl}" alt="Top Reasons" width="150" height="auto" border="0" style="display: block; margin: 0 auto; max-width: 150px; width: 150px; height: auto;" />
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center">
-                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25);">
+                  <td align="center" style="text-align: center;">
+                    <span style="display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; background-color: rgba(212, 175, 55, 0.12); padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(212, 175, 55, 0.25); line-height: 14px; text-align: center;">
                       Official Payment Receipt
                     </span>
                   </td>
